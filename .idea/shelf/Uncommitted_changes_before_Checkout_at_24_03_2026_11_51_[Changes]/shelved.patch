@@ -1,0 +1,16 @@
+Index: Prova saveschengenairports.py
+===================================================================
+diff --git a/Prova saveschengenairports.py b/Provasaveschengenairports.py
+rename from Prova saveschengenairports.py
+rename to Provasaveschengenairports.py
+--- a/Prova saveschengenairports.py	(revision 90f406e2305ac7419b087de10039aa522786a991)
++++ b/Provasaveschengenairports.py	(date 1774348576332)
+@@ -3,3 +3,8 @@
+ fitxer_sortida = "SSchengenAirports"
+ 
+ SaveSchengenAirports(fitxer_entrada, fitxer_sortida)
++
++from Addairportcode import *
++
++AddAirport(fitxer_entrada, Airport)
++

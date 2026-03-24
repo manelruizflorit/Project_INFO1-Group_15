@@ -1,0 +1,93 @@
+Index: LoadAriports.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>def LoadAirports(Airportsfile):\r\n    F = open(\"Airports\", \"r\")\r\n    airport = F.readline()\r\n    while airport != \"\":\r\n        elementos = airport.split(\" \")\r\n        Aeropuerto = str(elementos[0])\r\n        Lat = str(elementos[1])\r\n        Lon = str(elementos[2])\r\n        sur = False\r\n        latutud = 0\r\n        if Lat[0] == \"S\":\r\n            sur = True\r\n        else:\r\n            sur = False\r\n        oeste = false\r\n        if Lon[0] == \"W\":\r\n            oeste = True\r\n        else:\r\n            oeste = False\r\n        if sur == false:\r\n            latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600\r\n\r\n\r\n    F.close()\r\n\r\nprint(float(LatB))\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/LoadAriports.py b/LoadAriports.py
+--- a/LoadAriports.py	(revision 373438c9ccca78f5bad1c261b5b00ef9142e20ab)
++++ b/LoadAriports.py	(date 1774278016914)
+@@ -17,13 +17,13 @@
+             oeste = True
+         else:
+             oeste = False
+-        if sur == false:
++        if sur = False:
+             latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600
+ 
+ 
+     F.close()
+ 
+-print(float(LatB))
++print(float(latitud))
+ 
+ 
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/LoadAirports\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airportsfile\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main.py\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/test_airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/test_airport.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\r\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Airport.executor\": \"Run\",\r\n    \"Python.test_airport.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"Version-1\",\r\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\r\n      <created>1774092634606</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774092634606</updated>\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"Version-1\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 373438c9ccca78f5bad1c261b5b00ef9142e20ab)
++++ b/.idea/workspace.xml	(date 1774277955211)
+@@ -1,12 +1,9 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ChangeListManager">
+-    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/LoadAirports" beforeDir="false" afterPath="$PROJECT_DIR$/Airportsfile" afterDir="false" />
++    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="dd">
++      <change beforePath="$PROJECT_DIR$/Airportsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Airportsfile" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/test_airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_airport.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -47,6 +44,7 @@
+   "keyToString": {
+     "ModuleVcsDetector.initialDetectionPerformed": "true",
+     "Python.Airport.executor": "Run",
++    "Python.LoadAriports.executor": "Run",
+     "Python.test_airport.executor": "Run",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
+@@ -69,6 +67,23 @@
+       <option name="presentableId" value="Default" />
+       <updated>1774092634606</updated>
+     </task>
++    <task id="LOCAL-00001" summary="dd">
++      <option name="closed" value="true" />
++      <created>1774277154644</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1774277154644</updated>
++    </task>
++    <task id="LOCAL-00002" summary="dd">
++      <option name="closed" value="true" />
++      <created>1774277266144</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1774277266144</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -94,4 +109,8 @@
+       </map>
+     </option>
+   </component>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="dd" />
++    <option name="LAST_COMMIT_MESSAGE" value="dd" />
++  </component>
+ </project>
+\ No newline at end of file
