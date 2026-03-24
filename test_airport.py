@@ -4,9 +4,7 @@ Created on Mon Mar 23 23:19:06 2026
 
 @author: inesm
 """
-import matplotlib.pyplot as plt
 from airport import *
-
 
 print("Testing Step 2 ")
 my_airport = Airport("LEBL", 41.2974, 2.0832)

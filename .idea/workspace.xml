@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="" />
+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+      <change afterPath="$PROJECT_DIR$/Step 5?.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_airport.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,11 +22,32 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Version-1" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;manelruizflorit&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
+    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+  }
 }]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="3BFlKOzfZRrdEi9BZVfccWQy9Hc" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -28,10 +56,19 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Airport.executor": "Run",
+    "Python.LoadAriports.executor": "Run",
+    "Python.Prova saveschengenairports.executor": "Run",
+    "Python.airport.executor": "Run",
+    "Python.test_airport.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Version-1",
-    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Version---1--sharuk",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
+    "to.speed.mode.migration.done": "true"
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -49,6 +86,55 @@
       <option name="presentableId" value="Default" />
       <updated>1774092634606</updated>
     </task>
+    <task id="LOCAL-00001" summary="dd">
+      <option name="closed" value="true" />
+      <created>1774278302493</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1774278302493</updated>
+    </task>
+    <task id="LOCAL-00002" summary="dd">
+      <option name="closed" value="true" />
+      <created>1774278984622</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1774278984622</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Step 3 good">
+      <option name="closed" value="true" />
+      <created>1774281642680</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1774281642680</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Step 3 good">
+      <option name="closed" value="true" />
+      <created>1774281971115</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774281971115</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Step 3 good">
+      <option name="closed" value="true" />
+      <created>1774283570735</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1774283570735</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Step 3 good">
+      <option name="closed" value="true" />
+      <created>1774286268511</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1774286268511</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -73,5 +159,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="dd" />
+    <MESSAGE value="Step 3 good" />
+    <option name="LAST_COMMIT_MESSAGE" value="Step 3 good" />
   </component>
 </project>
