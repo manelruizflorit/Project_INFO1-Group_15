@@ -40,3 +40,13 @@ def MapAirports(airports):
         return -1
 
 from airport import *
+filename = 'airports.kml'
+airports = [Airport("LEBL", 41.2974, 2.0833), Airport("KJFK", 40.6413, -73.7781)]
+result = MapAirports(airports)
+if result == 0:
+    print("Archivo KML creado correctamente")
+else:
+    print("Error al crear el archivo")
+
+
+
