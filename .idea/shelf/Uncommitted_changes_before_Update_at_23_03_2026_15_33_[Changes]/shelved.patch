@@ -1,0 +1,66 @@
+Index: LoadAriports.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/LoadAriports.py b/LoadAriports.py
+--- a/LoadAriports.py	(revision 215fa005c990e4e4ba60dad7845cf8910efc38bf)
++++ b/LoadAriports.py	(date 1774275254560)
+@@ -1,0 +1,10 @@
++F = open("Airports", "r")
++airport = F.readline()
++while airport != "":
++    elementos = airport.split(" ")
++    Aeropuerto = elementos[0]
++    Lat = elementos[1]
++    Lon = elementos[2]
++
++
++
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"Step 3\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\r\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFmu5Ginb5ewoTmMVLhOMOY758\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Version-1.executor\": \"Run\",\r\n    \"Python.test_airport.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"Version-1\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"\" />\r\n      <created>1774093414535</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774093414535</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177515358</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177515358</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177763784</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177763784</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177798551</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177798551</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177882413</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177882413</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Canvi de prova\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774179549828</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774179549828</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Step 1\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774266969826</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774266969826</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"Step 2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774273864845</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774273864845</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"Step 3\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774273939716</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774273939716</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"Step 3\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774274043728</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774274043728</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"10\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"canvis\" />\r\n    <MESSAGE value=\"Canvi de prova\" />\r\n    <MESSAGE value=\"Step 1\" />\r\n    <MESSAGE value=\"Step 2\" />\r\n    <MESSAGE value=\"Step 3\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 215fa005c990e4e4ba60dad7845cf8910efc38bf)
++++ b/.idea/workspace.xml	(date 1774274747568)
+@@ -3,11 +3,19 @@
+   <component name="ChangeListManager">
+     <list default="true" id="95b10fe3-2dbe-42b7-9756-cd6c7988079b" name="Changes" comment="Step 3">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="FileTemplateManagerImpl">
++    <option name="RECENT_TEMPLATES">
++      <list>
++        <option value="Python Script" />
++      </list>
++    </option>
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+@@ -130,7 +138,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1774274043728</updated>
+     </task>
+-    <option name="localTasksCounter" value="10" />
++    <task id="LOCAL-00010" summary="Step 3">
++      <option name="closed" value="true" />
++      <created>1774274615022</created>
++      <option name="number" value="00010" />
++      <option name="presentableId" value="LOCAL-00010" />
++      <option name="project" value="LOCAL" />
++      <updated>1774274615022</updated>
++    </task>
++    <option name="localTasksCounter" value="11" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
