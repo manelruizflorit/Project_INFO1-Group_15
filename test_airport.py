@@ -1,51 +1,38 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 23 23:19:06 2026
-
-@author: inesm
-"""
 from airport import *
 
-print("Testing Step 2 ")
-my_airport = Airport("LEBL", 41.2974, 2.0832)
-SetSchengen(my_airport)
-PrintAirport(my_airport)
-print("TEST when non schengen airports")
-my_airport = Airport("KZBL", 45.3453, 9.0895)
-SetSchengen(my_airport)
-PrintAirport(my_airport)
+# Test manual
+print("--- Step 2 ---")
+a = Airport("LEBL", 41.297, 2.083)
+SetSchengen(a)
+PrintAirport(a)
 
+# 1. On charge la liste initiale UNE SEULE FOIS
+my_list = LoadAirports("Airports.txt")
 
-print("Testing Step 4 ")
+# 2. On ajoute les aéroports à la liste en mémoire
+AddAirport(my_list, a)
+print(my_list)
 
-# 1. Load from file
-# Make sure you have created Airports.txt (see below)
-list_of_airports = LoadAirports("Airports.txt")
-print(f"Loaded {len(list_of_airports)} airports from file.")
-
-# 2. Add a new airport
-new_one = Airport("TRGH", 34.0097, 6.5479) # Paris CDG
-AddAirport(list_of_airports, new_one)
-print(f"After adding LFPG, total: {len(list_of_airports)}")
-
-# 3. Remove an airport (Example: BIKF if it exists in your file)
-res = RemoveAirport(list_of_airports, "BIKF")
-if res == 0:
-    print("BIKF removed successfully.")
-
-NbSchengen = NbSchengenAirports(list_of_airports, "Schengen_Results.txt")
-Nbtotal = len(list_of_airports)
+a1 = Airport("LZER", 44.297, 2.453)
+SetSchengen(a1)
+PrintAirport(a1)
+AddAirport(my_list, a1)
 
 
 
-# 4. Save Schengen only
-# We must update the Schengen status for all before saving
-for a in list_of_airports:
-    SetSchengen(a)
 
-status = SaveSchengenAirports(list_of_airports, "Schengen_Results.txt")
-if status == 0:
-    print("Schengen airports saved to 'Schengen_Results.txt'!")
-else:
-    print("No Schengen airports to save.")
-    
+# Test file & plot
+print("\n--- Step 4 & 5 ---")
+
+# --- LIGNE SUPPRIMÉE ICI ---
+# my_list = LoadAirports("Airports.txt") <- C'est elle qui effaçait tout !
+
+print(f"Loaded {len(my_list)} airports with decimals.")
+
+# Show Plot
+PlotAirports(my_list)
+
+# 3. On sauvegarde le résultat final dans le fichier texte
+SaveSchengenAirports(my_list, "Airports.txt")
+print("Schengen list saved to Airports.txt")
