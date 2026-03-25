@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="N">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GoogleEarthfunction.py" beforeDir="false" afterPath="$PROJECT_DIR$/GoogleEarthfunction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/airport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,12 +33,12 @@
     &quot;assignee&quot;: &quot;manelruizflorit&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
-    "accountId": "d401ea14-3304-4aaa-9efc-db1c8e31c008"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -61,6 +59,7 @@
     "Python.LoadAriports.executor": "Run",
     "Python.Prova saveschengenairports.executor": "Run",
     "Python.airport.executor": "Run",
+    "Python.interface.executor": "Run",
     "Python.test_airport.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -159,7 +158,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774433125482</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="N">
+      <option name="closed" value="true" />
+      <created>1774435927208</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1774435927208</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
