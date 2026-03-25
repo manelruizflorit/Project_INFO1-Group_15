@@ -1,6 +1,5 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+from airport import *
+filename = 'airports.kml'
 def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
     if not airports:
@@ -44,8 +43,6 @@ def MapAirports(airports):
     except IOError:
         return -1
 
-from airport import *
-filename = 'airports.kml'
 airports = [Airport("LEBL", 41.2974, 2.0833), Airport("KJFK", 40.6413, -73.7781), Airport("LGKF", 38.1201, 20.5005)]
 result = MapAirports(airports)
 if result == 0:

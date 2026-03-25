@@ -129,6 +129,7 @@ def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
     if not airports:
         return -1
+    filename = "airports.kml"
     try:
     # We create a KML file to edit it.
         with open(filename, 'w') as file:
