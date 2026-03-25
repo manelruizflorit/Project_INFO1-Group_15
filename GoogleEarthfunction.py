@@ -1,7 +1,5 @@
 def MapAirports(airports):
-    # Esta funcion nos permite mostrar en Google Earth lso diferentes
-    # aeropuertos de la lista, distinguiendolos por colores entre
-    # shengen y no shengen
+    # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
     if not airports:
         return -1
     try:
@@ -13,8 +11,9 @@ def MapAirports(airports):
     # We differentiate from Shengen to non shengen airports with red and blue colors
             i = 0
             while i < len(airports):
-                if airports[i].schengen:
-                    pin_color = "ff0000ff"
+                SetSchengen(airports[i])
+                if airports[i].schengen :
+                    pin_color = "ff00ffff"
                 else:
                     pin_color = "ffff0000"
     # It generates a Placemark for every airport defining it for google Earth
@@ -24,6 +23,9 @@ def MapAirports(airports):
                 file.write('    <Style>')
                 file.write('      <IconStyle>\n')
                 file.write('        <color>' + pin_color + '</color>\n')
+                file.write('        <Icon>\n')
+                file.write('          <href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href>\n')
+                file.write('        </Icon>\n')
                 file.write('      </IconStyle>\n')
                 file.write('    </Style>')
                 file.write('    <Point>\n')
@@ -41,12 +43,13 @@ def MapAirports(airports):
 
 from airport import *
 filename = 'airports.kml'
-airports = [Airport("LEBL", 41.2974, 2.0833), Airport("KJFK", 40.6413, -73.7781)]
+airports = [Airport("LEBL", 41.2974, 2.0833), Airport("KJFK", 40.6413, -73.7781), Airport("LGKF", 38.1201, 20.5005)]
 result = MapAirports(airports)
 if result == 0:
     print("Archivo KML creado correctamente")
 else:
     print("Error al crear el archivo")
-
+import os
+print(os.getcwd())
 
 
