@@ -1,0 +1,64 @@
+Index: SSchengenAirports
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>CODE LAT LON\nBIKF N635906 W0223620\nEBAW N511122 E0042737
+===================================================================
+diff --git a/SSchengenAirports b/SSchengenAirports
+--- a/SSchengenAirports	(revision 90f406e2305ac7419b087de10039aa522786a991)
++++ b/SSchengenAirports	(date 1774347289487)
+@@ -1,3 +1,0 @@
+-CODE LAT LON
+-BIKF N635906 W0223620
+-EBAW N511122 E0042737
+\ No newline at end of file
+Index: LoadAriports.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>def LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\nLoadAirports(\"Airportsfile.txt\")\n\n\n\n\n\n\n\n\n\n\n\n
+===================================================================
+diff --git a/LoadAriports.py b/LoadAriports.py
+--- a/LoadAriports.py	(revision 90f406e2305ac7419b087de10039aa522786a991)
++++ b/LoadAriports.py	(date 1774347284261)
+@@ -1,30 +1,18 @@
+ def LoadAirports(Airportsfile):
+-    F = open("Airportsfile", "r")
+-    next(F)
+-    Aerodatos = F.readline()
+-    while Aerodatos != "":
+-        elementos = Aerodatos.split(" ")
+-        ICAO = elementos[0]
+-        Latitude = elementos[1]
+-        Longitude = elementos[2]
+-        Lat_signe = 1
+-        Long_signe = 1
+-        if Latitude[0] == "S":
+-            Lat_signe = -1
+-        if Longitude[0] == "W":
+-            Long_signe = -1
+-        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe
+-        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe
+-        print(ICAO + " " + str(latitud) + " " + str(longitud))
+-        Aerodatos = F.readline()
++    F = open("Airports", "r")
++    airport = F.readline()
++    Lat = [0]*7
++    while airport != "":
++        elementos = airport.split(" ")
++        Aeropuerto = elementos[0]
++        Lat = eval(str(elementos[1]))
++        Lon = str(elementos[2])
++        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)
++        if Lat[0] == "S":
++            latitud *= -1
+     F.close()
+-LoadAirports("Airportsfile.txt")
+-
+ 
+-
+-
+-
+-
++print(Lat)
+ 
+ 
+ 

@@ -1,0 +1,133 @@
+Index: LoadAriports.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>def LoadAirports(Airportsfile):\n    F = open(\"Airports\", \"r\")\n    airport = F.readline()\n    Lat = [0]*7\n    while airport != \"\":\n        elementos = airport.split(\" \")\n        Aeropuerto = elementos[0]\n        Lat = eval(str(elementos[1]))\n        Lon = str(elementos[2])\n        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)\n        if Lat[0] == \"S\":\n            latitud *= -1\n    F.close()\n\nprint(Lat)\n\n\n\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/LoadAriports.py b/LoadAriports.py
+--- a/LoadAriports.py	(revision 9141267eb85915f0b2ad61d33ae5f0bf363c50cc)
++++ b/LoadAriports.py	(date 1774278995146)
+@@ -1,19 +1,29 @@
+ def LoadAirports(Airportsfile):
+     F = open("Airports", "r")
+     airport = F.readline()
+-    Lat = [0]*7
+     while airport != "":
+         elementos = airport.split(" ")
+-        Aeropuerto = elementos[0]
+-        Lat = eval(str(elementos[1]))
++        Aeropuerto = str(elementos[0])
++        Lat = str(elementos[1])
+         Lon = str(elementos[2])
+-        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)
++        sur = False
++        latitud = 0
++        oeste = False
+         if Lat[0] == "S":
+-            latitud *= -1
++            sur = True
++        else:
++            sur = False
++        if Lon[0] == "W":
++            oeste = True
++        else:
++            oeste = False
++        if sur == false:
++            latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600
++
++
+     F.close()
+ 
+-print(Lat)
+-
++print(float(Latitud))
+ 
+ 
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 9141267eb85915f0b2ad61d33ae5f0bf363c50cc)
++++ b/.idea/workspace.xml	(date 1774280556971)
+@@ -1,7 +1,10 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
++    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="a">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+     </list>
+@@ -26,12 +29,16 @@
+     &quot;assignee&quot;: &quot;manelruizflorit&quot;
+   }
+ }</component>
+-  <component name="GithubPullRequestsUISettings">{
+-  &quot;selectedUrlAndAccountId&quot;: {
+-    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+-    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
++  <component name="GithubPullRequestsUISettings"><![CDATA[{
++  "selectedUrlAndAccountId": {
++    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
++    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+   }
+-}</component>
++}]]></component>
++  <component name="McpProjectServerCommands">
++    <commands />
++    <urls />
++  </component>
+   <component name="ProjectColorInfo">{
+   &quot;associatedIndex&quot;: 2
+ }</component>
+@@ -46,10 +53,14 @@
+     "Python.Airport.executor": "Run",
+     "Python.LoadAriports.executor": "Run",
+     "Python.test_airport.executor": "Run",
++    "RunOnceActivity.MCP Project settings loaded": "true",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
++    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+     "git-widget-placeholder": "Version-1",
+-    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
++    "junie.onboarding.icon.badge.shown": "true",
++    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
++    "to.speed.mode.migration.done": "true"
+   }
+ }]]></component>
+   <component name="SharedIndexes">
+@@ -67,6 +78,15 @@
+       <option name="presentableId" value="Default" />
+       <updated>1774092634606</updated>
+     </task>
++    <task id="LOCAL-00001" summary="a">
++      <option name="closed" value="true" />
++      <created>1774277351903</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1774277351903</updated>
++    </task>
++    <option name="localTasksCounter" value="2" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -92,4 +112,8 @@
+       </map>
+     </option>
+   </component>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="a" />
++    <option name="LAST_COMMIT_MESSAGE" value="a" />
++  </component>
+ </project>
+\ No newline at end of file

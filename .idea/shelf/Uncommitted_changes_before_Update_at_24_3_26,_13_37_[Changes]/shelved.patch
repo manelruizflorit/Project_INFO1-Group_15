@@ -1,0 +1,10 @@
+Index: Step 5?.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>def PlotAirports(airports):\n
+===================================================================
+diff --git a/Step 5?.py b/Step 5?.py
+--- a/Step 5?.py	(revision ed22ed57813c083bbbca33391f21f3814b93ed9d)
++++ b/Step 5?.py	(date 1774355756454)
+@@ -1,1 +1,0 @@
+-def PlotAirports(airports):

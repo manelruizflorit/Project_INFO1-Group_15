@@ -1,0 +1,150 @@
+Index: Airport.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>class Airport:\n    def __init__(self, code: str, latitude:float , longitude: float):\n        if len(code) != 4:\n            raise ValueError(\"Invalid ICAO code\")\n        self.code = code.upper()\n        self.latitude = latitude\n        self.longitude = longitude\n        self.schengen = False\ndef IsSchengenAirport(code):\n    if  not code:\n        return False\n    codigos = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH', 'BI', 'LI', 'EV', 'EY', 'EL', 'LM', 'EN', 'EP', 'LP', 'LZ', 'LJ', 'LE', 'ES', 'LS']\n    encontrado = False\n    i = 0\n    while i < len(codigos) and not encontrado:\n        if codigos[i] == code[0:2]:\n            encontrado = True\n        else:\n            i += 1\n    if encontrado:\n        return True\ndef SetSchengen(airport: Airport):\n    airport.schengen = IsSchengenAirport(airport.code)\ndef PrintAirport(airport: Airport):\n    print(\"Airport code: \", airport.code)\n    print(\"Latitude: \", airport.latitude)\n    print(\"Longitude: \", airport.longitude)\n    print(\"Schengen: \", airport.schengen)\n\ndef LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\n\n\ndef SaveSchengenAirports(Airportsfile, SSchengenAirports):\n    F = open(Airportsfile, \"r\")\n    Q = open(SSchengenAirports, \"w\")\n    if len(Airportsfile) == 0:\n        print(\"No Airports file\")\n    capçalera = F.readline()\n    Q.write(capçalera)\n    Aeropuerto = F.readline()\n    while Aeropuerto != \"\":\n        elementos = Aeropuerto.split(\" \")\n        if IsSchengenAirport(elementos[0]) == True:\n            Q.write(Aeropuerto)\n        Aeropuerto = F.readline()\n    Q.close()\n    F.close()\n\n\n\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Airport.py b/Airport.py
+--- a/Airport.py	(revision 90f406e2305ac7419b087de10039aa522786a991)
++++ b/Airport.py	(date 1774347286973)
+@@ -49,23 +49,18 @@
+     F.close()
+ 
+ 
+-def SaveSchengenAirports(Airportsfile, SSchengenAirports):
++def SaveSchengenAirports(Airportsfile, schengenAirports):
+     F = open(Airportsfile, "r")
+-    Q = open(SSchengenAirports, "w")
+-    if len(Airportsfile) == 0:
+-        print("No Airports file")
+-    capçalera = F.readline()
+-    Q.write(capçalera)
+     Aeropuerto = F.readline()
++    Q = open("schengenAirports.txt", "w")
+     while Aeropuerto != "":
+         elementos = Aeropuerto.split(" ")
+         if IsSchengenAirport(elementos[0]) == True:
+             Q.write(Aeropuerto)
+-        Aeropuerto = F.readline()
++            next(Q)
+     Q.close()
+     F.close()
+-
+-
++SaveSchengenAirports(Airportsfile.txt,schengenAirports)
+ 
+ 
+ 
+Index: RemoveAirport.py
+===================================================================
+diff --git a/RemoveAirport.py b/RemoveAirport.py
+new file mode 100644
+--- /dev/null	(date 1774348446037)
++++ b/RemoveAirport.py	(date 1774348446037)
+@@ -0,0 +1,14 @@
++def RemoveAirport(Airportsfile, code):
++    code = str(input("Enter Airport ICAO Code, Latitude and Longitude: "))
++    P = open(Airportsfile, "r")
++    Aeropuertos = P.readline()
++    while code != Aeropuertos and code != "":
++        Aeropuertos = P.readline()
++    if code == Aeropuertos:
++        P.
++
++    if code == "":
++
++
++
++
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\n      <change afterPath=\"$PROJECT_DIR$/Prova saveschengenairports.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/Airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airport.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/SSchengenAirports\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/SSchengenAirports\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.Prova saveschengenairports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774283570735</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774283570735</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774286268511</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774286268511</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"7\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 90f406e2305ac7419b087de10039aa522786a991)
++++ b/.idea/workspace.xml	(date 1774347887535)
+@@ -1,10 +1,14 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
+   <component name="ChangeListManager">
+     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+-      <change afterPath="$PROJECT_DIR$/Prova saveschengenairports.py" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/RemoveAirport.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/Airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/Airport.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/SSchengenAirports" beforeDir="false" afterPath="$PROJECT_DIR$/SSchengenAirports" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -28,12 +32,16 @@
+     &quot;assignee&quot;: &quot;manelruizflorit&quot;
+   }
+ }</component>
+-  <component name="GithubPullRequestsUISettings">{
+-  &quot;selectedUrlAndAccountId&quot;: {
+-    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+-    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
++  <component name="GithubPullRequestsUISettings"><![CDATA[{
++  "selectedUrlAndAccountId": {
++    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
++    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+   }
+-}</component>
++}]]></component>
++  <component name="McpProjectServerCommands">
++    <commands />
++    <urls />
++  </component>
+   <component name="ProjectColorInfo">{
+   &quot;associatedIndex&quot;: 2
+ }</component>
+@@ -47,12 +55,15 @@
+     "ModuleVcsDetector.initialDetectionPerformed": "true",
+     "Python.Airport.executor": "Run",
+     "Python.LoadAriports.executor": "Run",
+-    "Python.Prova saveschengenairports.executor": "Run",
+     "Python.test_airport.executor": "Run",
++    "RunOnceActivity.MCP Project settings loaded": "true",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
++    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+     "git-widget-placeholder": "Version-1",
+-    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
++    "junie.onboarding.icon.badge.shown": "true",
++    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
++    "to.speed.mode.migration.done": "true"
+   }
+ }]]></component>
+   <component name="SharedIndexes">
+@@ -102,23 +113,7 @@
+       <option name="project" value="LOCAL" />
+       <updated>1774281971115</updated>
+     </task>
+-    <task id="LOCAL-00005" summary="Step 3 good">
+-      <option name="closed" value="true" />
+-      <created>1774283570735</created>
+-      <option name="number" value="00005" />
+-      <option name="presentableId" value="LOCAL-00005" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1774283570735</updated>
+-    </task>
+-    <task id="LOCAL-00006" summary="Step 3 good">
+-      <option name="closed" value="true" />
+-      <created>1774286268511</created>
+-      <option name="number" value="00006" />
+-      <option name="presentableId" value="LOCAL-00006" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1774286268511</updated>
+-    </task>
+-    <option name="localTasksCounter" value="7" />
++    <option name="localTasksCounter" value="5" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
