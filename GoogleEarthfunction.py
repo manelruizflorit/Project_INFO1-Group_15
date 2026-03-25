@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
     if not airports:

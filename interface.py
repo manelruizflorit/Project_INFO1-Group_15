@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from airport import * # Import all your functions
-
+from airport import * # Import all your function
 # Global variable to store our list of airports in memory
 my_airports = []
 
