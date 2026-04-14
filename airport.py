@@ -55,7 +55,8 @@ def LoadAirports(filename):
 
         for i in range(1, len(lines)):
             line = lines[i].strip()
-            if not line: continue    
+            if not line:
+                continue
             
             parts = line.split()
             if len(parts) == 3:
