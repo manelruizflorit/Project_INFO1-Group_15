@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from airport import * # Import all your function
+from matplotlib import *
 # Global variable to store our list of airports in memory
 my_airports = []
 
@@ -58,7 +59,8 @@ def show_plot():
     """Displays the matplotlib graph"""
     PlotAirports(my_airports)
 
-
+def google_earth():
+    MapAirports(my_airports)
 # --- 2. WINDOW CREATION (GUI) ---
 
 window = tk.Tk()
@@ -89,6 +91,7 @@ list_box.pack(pady=5)
 tk.Button(window, text="1. Load from file", command=load_file).pack(fill='x', padx=20, pady=2)
 tk.Button(window, text="2. Remove selection", command=remove_airport).pack(fill='x', padx=20, pady=2)
 tk.Button(window, text="3. Show plot", command=show_plot).pack(fill='x', padx=20, pady=2)
+tk.Button(window, text="3. Google Earth", command=google_earth()).pack(fill='x', padx=20, pady=2)
 tk.Button(window, text="4. Save (Schengen only)", command=save_file).pack(fill='x', padx=20, pady=2)
 
 # Launch the application

@@ -1,0 +1,1436 @@
+Index: GoogleEarthfunction.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import matplotlib.pyplot as plt\nimport pandas as pd\nimport seaborn as sns\ndef MapAirports(airports):\n    # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors\n    if not airports:\n        return -1\n    try:\n    # We create a KML file to edit it.\n        with open(filename, 'w') as file:\n            file.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\\n')\n            file.write('<kml xmlns=\"http://www.opengis.net/kml/2.2\">\\n')\n            file.write('<Document>\\n')\n    # We differentiate from Shengen to non shengen airports with red and blue colors\n            i = 0\n            while i < len(airports):\n                SetSchengen(airports[i])\n                if airports[i].schengen :\n                    pin_color = \"ff00ffff\"\n                else:\n                    pin_color = \"ffff0000\"\n    # It generates a Placemark for every airport defining it for google Earth\n                airport = airports[i]\n                file.write('  <Placemark>\\n')\n                file.write('    <name>' + airport.code + '</name>\\n')\n                file.write('    <Style>')\n                file.write('      <IconStyle>\\n')\n                file.write('        <color>' + pin_color + '</color>\\n')\n                file.write('        <Icon>\\n')\n                file.write('          <href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href>\\n')\n                file.write('        </Icon>\\n')\n                file.write('      </IconStyle>\\n')\n                file.write('    </Style>')\n                file.write('    <Point>\\n')\n\n                coords = str(airport.lon) + \",\" + str(airport.lat)\n                file.write('      <coordinates>' + coords + '</coordinates>\\n')\n                file.write('    </Point>\\n')\n                file.write('  </Placemark>\\n')\n                i += 1\n            file.write('</Document>\\n')\n            file.write('</kml>\\n')\n        return 0\n    except IOError:\n        return -1\n\nfrom airport import *\nfilename = 'airports.kml'\nairports = [Airport(\"LEBL\", 41.2974, 2.0833), Airport(\"KJFK\", 40.6413, -73.7781), Airport(\"LGKF\", 38.1201, 20.5005)]\nresult = MapAirports(airports)\nif result == 0:\n    print(\"Archivo KML creado correctamente\")\nelse:\n    print(\"Error al crear el archivo\")\nimport os\nprint(os.getcwd())\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/GoogleEarthfunction.py b/GoogleEarthfunction.py
+--- a/GoogleEarthfunction.py	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ b/GoogleEarthfunction.py	(date 1774437034206)
+@@ -1,6 +1,3 @@
+-import matplotlib.pyplot as plt
+-import pandas as pd
+-import seaborn as sns
+ def MapAirports(airports):
+     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
+     if not airports:
+Index: interface.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import tkinter as tk\r\nfrom tkinter import messagebox\r\nfrom airport import * # Import all your function\r\n# Global variable to store our list of airports in memory\r\nmy_airports = []\r\n\r\n# --- 1. INTERFACE FUNCTIONS ---\r\n\r\ndef refresh_list():\r\n    \"\"\"Clears the display area and fills it with the updated list\"\"\"\r\n    list_box.delete(0, tk.END)\r\n    for a in my_airports:\r\n        status = \"Schengen\" if a.schengen else \"Non-Schengen\"\r\n        list_box.insert(tk.END, f\"{a.code} - Lat: {a.lat} / Lon: {a.lon} ({status})\")\r\n\r\ndef load_file():\r\n    \"\"\"Loads the text file\"\"\"\r\n    global my_airports\r\n    my_airports = LoadAirports(\"Airports.txt\")\r\n    for a in my_airports:\r\n        SetSchengen(a) # Updates the Schengen status\r\n    refresh_list()\r\n\r\ndef add_airport():\r\n    \"\"\"Adds an airport from the text fields\"\"\"\r\n    code = entry_code.get().strip().upper()\r\n    try:\r\n        lat = float(entry_lat.get())\r\n        lon = float(entry_lon.get())\r\n        \r\n        new_airport = Airport(code, lat, lon)\r\n        SetSchengen(new_airport)\r\n        AddAirport(my_airports, new_airport)\r\n        \r\n        refresh_list()\r\n        # Clear the fields after adding\r\n        entry_code.delete(0, tk.END)\r\n        entry_lat.delete(0, tk.END)\r\n        entry_lon.delete(0, tk.END)\r\n    except ValueError:\r\n        messagebox.showerror(\"Error\", \"Latitude and longitude must be numbers!\")\r\n\r\ndef remove_airport():\r\n    \"\"\"Removes the selected row from the list\"\"\"\r\n    selection = list_box.curselection() # Gets the clicked row\r\n    if selection:\r\n        index = selection[0]\r\n        code_to_remove = my_airports[index].code\r\n        RemoveAirport(my_airports, code_to_remove)\r\n        refresh_list()\r\n\r\ndef save_file():\r\n    \"\"\"Saves only Schengen airports to the file\"\"\"\r\n    SaveSchengenAirports(my_airports, \"Airports.txt\")\r\n    messagebox.showinfo(\"Success\", \"Schengen airports saved!\")\r\n\r\ndef show_plot():\r\n    \"\"\"Displays the matplotlib graph\"\"\"\r\n    PlotAirports(my_airports)\r\n\r\n\r\n# --- 2. WINDOW CREATION (GUI) ---\r\n\r\nwindow = tk.Tk()\r\nwindow.title(\"Airport Manager\")\r\nwindow.geometry(\"400x550\")\r\n\r\n# --- Add Section ---\r\ntk.Label(window, text=\"ICAO Code:\").pack(pady=(10, 0))\r\nentry_code = tk.Entry(window)\r\nentry_code.pack()\r\n\r\ntk.Label(window, text=\"Latitude:\").pack()\r\nentry_lat = tk.Entry(window)\r\nentry_lat.pack()\r\n\r\ntk.Label(window, text=\"Longitude:\").pack()\r\nentry_lon = tk.Entry(window)\r\nentry_lon.pack()\r\n\r\ntk.Button(window, text=\"Add this airport\", bg=\"lightgreen\", command=add_airport).pack(pady=10)\r\n\r\n# --- Display Section (List) ---\r\ntk.Label(window, text=\"List of airports in memory:\").pack()\r\nlist_box = tk.Listbox(window, width=50, height=10)\r\nlist_box.pack(pady=5)\r\n\r\n# --- Action Buttons ---\r\ntk.Button(window, text=\"1. Load from file\", command=load_file).pack(fill='x', padx=20, pady=2)\r\ntk.Button(window, text=\"2. Remove selection\", command=remove_airport).pack(fill='x', padx=20, pady=2)\r\ntk.Button(window, text=\"3. Show plot\", command=show_plot).pack(fill='x', padx=20, pady=2)\r\ntk.Button(window, text=\"4. Save (Schengen only)\", command=save_file).pack(fill='x', padx=20, pady=2)\r\n\r\n# Launch the application\r\nwindow.mainloop()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/interface.py b/interface.py
+--- a/interface.py	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ b/interface.py	(date 1774436784200)
+@@ -1,6 +1,7 @@
+ import tkinter as tk
+ from tkinter import messagebox
+ from airport import * # Import all your function
++from matplotlib import *
+ # Global variable to store our list of airports in memory
+ my_airports = []
+ 
+@@ -58,7 +59,8 @@
+     """Displays the matplotlib graph"""
+     PlotAirports(my_airports)
+ 
+-
++def google_earth():
++    MapAirports(my_airports)
+ # --- 2. WINDOW CREATION (GUI) ---
+ 
+ window = tk.Tk()
+@@ -89,6 +91,7 @@
+ tk.Button(window, text="1. Load from file", command=load_file).pack(fill='x', padx=20, pady=2)
+ tk.Button(window, text="2. Remove selection", command=remove_airport).pack(fill='x', padx=20, pady=2)
+ tk.Button(window, text="3. Show plot", command=show_plot).pack(fill='x', padx=20, pady=2)
++tk.Button(window, text="3. Google Earth", command=google_earth()).pack(fill='x', padx=20, pady=2)
+ tk.Button(window, text="4. Save (Schengen only)", command=save_file).pack(fill='x', padx=20, pady=2)
+ 
+ # Launch the application
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51__Changes_1.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51__Changes_1.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51__Changes_1.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51__Changes_1.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1" date="1774349522382" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 24/03/2026 11:51 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,200 +0,0 @@
+-Index: LoadAriports.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>def LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\nLoadAirports(\"Airportsfile.txt\")\n\n\n\n\n\n\n\n\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/LoadAriports.py b/LoadAriports.py
+---- a/LoadAriports.py	(revision 73cf647bdd6cd5d518dbae4b7695d6a1c58b97aa)
+-+++ b/LoadAriports.py	(date 1774283580199)
+-@@ -1,30 +1,18 @@
+- def LoadAirports(Airportsfile):
+--    F = open("Airportsfile", "r")
+--    next(F)
+--    Aerodatos = F.readline()
+--    while Aerodatos != "":
+--        elementos = Aerodatos.split(" ")
+--        ICAO = elementos[0]
+--        Latitude = elementos[1]
+--        Longitude = elementos[2]
+--        Lat_signe = 1
+--        Long_signe = 1
+--        if Latitude[0] == "S":
+--            Lat_signe = -1
+--        if Longitude[0] == "W":
+--            Long_signe = -1
+--        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe
+--        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe
+--        print(ICAO + " " + str(latitud) + " " + str(longitud))
+--        Aerodatos = F.readline()
+-+    F = open("Airports", "r")
+-+    airport = F.readline()
+-+    Lat = [0]*7
+-+    while airport != "":
+-+        elementos = airport.split(" ")
+-+        Aeropuerto = elementos[0]
+-+        Lat = eval(str(elementos[1]))
+-+        Lon = str(elementos[2])
+-+        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)
+-+        if Lat[0] == "S":
+-+            latitud *= -1
+-     F.close()
+--LoadAirports("Airportsfile.txt")
+--
+- 
+--
+--
+--
+--
+-+print(Lat)
+- 
+- 
+- 
+-Index: Airport.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>class Airport:\n    def __init__(self, code: str, latitude:float , longitude: float):\n        if len(code) != 4:\n            raise ValueError(\"Invalid ICAO code\")\n        self.code = code.upper()\n        self.latitude = latitude\n        self.longitude = longitude\n        self.schengen = False\ndef IsSchengenAirport(code):\n    if  not code:\n        return False\n    codigos = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH', 'BI', 'LI', 'EV', 'EY', 'EL', 'LM', 'EN', 'EP', 'LP', 'LZ', 'LJ', 'LE', 'ES', 'LS']\n    encontrado = False\n    i = 0\n    while i < len(codigos) and not encontrado:\n        if codigos[i] == code[0:2]:\n            encontrado = True\n        else:\n            i += 1\n    if encontrado:\n        return True\ndef SetSchengen(airport: Airport):\n    airport.schengen = IsSchengenAirport(airport.code)\ndef PrintAirport(airport: Airport):\n    print(\"Airport code: \", airport.code)\n    print(\"Latitude: \", airport.latitude)\n    print(\"Longitude: \", airport.longitude)\n    print(\"Schengen: \", airport.schengen)\n\ndef LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\n\n\ndef SaveSchengenAirports(Airportsfile, schengenAirports):\n    F = open(Airportsfile, \"r\")\n    Aeropuerto = F.readline()\n    Q = open(\"schengenAirports.txt\", \"w\")\n    while Aeropuerto != \"\":\n        elementos = Aeropuerto.split(\" \")\n        if IsSchengenAirport(elementos[0]) == True:\n            Q.write(Aeropuerto)\n            next(Q)\n    Q.close()\n    F.close()\nSaveSchengenAirports(Airportsfile.txt,schengenAirports)\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/Airport.py b/Airport.py
+---- a/Airport.py	(revision 73cf647bdd6cd5d518dbae4b7695d6a1c58b97aa)
+-+++ b/Airport.py	(date 1774285786856)
+-@@ -48,19 +48,20 @@
+-         Aerodatos = F.readline()
+-     F.close()
+- 
+-+lista_aeropuertos = LoadAirports("Airportsfile.txt")
+- 
+--def SaveSchengenAirports(Airportsfile, schengenAirports):
+--    F = open(Airportsfile, "r")
+--    Aeropuerto = F.readline()
+--    Q = open("schengenAirports.txt", "w")
+--    while Aeropuerto != "":
+--        elementos = Aeropuerto.split(" ")
+--        if IsSchengenAirport(elementos[0]) == True:
+--            Q.write(Aeropuerto)
+--            next(Q)
+--    Q.close()
+-+def SaveSchengenAirports(lista_aeropuertos, filename):
+-+    if len(lista_aeropuertos) == 0:
+-+        return ("Invalid data")
+-+    F = open(filename, "w")
+-+    F.write("CODE LAT LON\n")
+-+    for airport in lista_aeropuertos:
+-+        if IsSchengenAirport(airport.code) == True:
+-+            line = airport.code + " " + str(airport.latitude) + " " + str(airport.longitude) + "\n"
+-+            F.write(line)
+-     F.close()
+--SaveSchengenAirports(Airportsfile.txt,schengenAirports)
+-+SaveSchengenAirports(lista_aeropuertos, "SSchengenAirports.txt")
+-+
+- 
+- 
+- 
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\n      <change afterPath=\"$PROJECT_DIR$/SaveSchengenAirports.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/Airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airport.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"5\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 73cf647bdd6cd5d518dbae4b7695d6a1c58b97aa)
+-+++ b/.idea/workspace.xml	(date 1774285098367)
+-@@ -1,10 +1,14 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-+  <component name="AutoImportSettings">
+-+    <option name="autoReloadType" value="SELECTIVE" />
+-+  </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+--      <change afterPath="$PROJECT_DIR$/SaveSchengenAirports.py" afterDir="false" />
+-+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="dd">
+-+      <change afterPath="$PROJECT_DIR$/SSchengenAirports" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/Airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/Airport.py" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -33,6 +37,10 @@
+-     &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
+-   }
+- }</component>
+-+  <component name="McpProjectServerCommands">
+-+    <commands />
+-+    <urls />
+-+  </component>
+-   <component name="ProjectColorInfo">{
+-   &quot;associatedIndex&quot;: 2
+- }</component>
+-@@ -41,18 +49,18 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent"><![CDATA[{
+--  "keyToString": {
+--    "ModuleVcsDetector.initialDetectionPerformed": "true",
+--    "Python.Airport.executor": "Run",
+--    "Python.LoadAriports.executor": "Run",
+--    "Python.test_airport.executor": "Run",
+--    "RunOnceActivity.ShowReadmeOnStart": "true",
+--    "RunOnceActivity.git.unshallow": "true",
+--    "git-widget-placeholder": "Version-1",
+--    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
+-+  <component name="PropertiesComponent">{
+-+  &quot;keyToString&quot;: {
+-+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+-+    &quot;Python.Airport.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,
+-+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+-+    &quot;git-widget-placeholder&quot;: &quot;Version-1&quot;,
+-+    &quot;last_opened_file_path&quot;: &quot;C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15&quot;
+-   }
+--}]]></component>
+-+}</component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+-@@ -84,23 +92,7 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774278984622</updated>
+-     </task>
+--    <task id="LOCAL-00003" summary="Step 3 good">
+--      <option name="closed" value="true" />
+--      <created>1774281642680</created>
+--      <option name="number" value="00003" />
+--      <option name="presentableId" value="LOCAL-00003" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774281642680</updated>
+--    </task>
+--    <task id="LOCAL-00004" summary="Step 3 good">
+--      <option name="closed" value="true" />
+--      <created>1774281971115</created>
+--      <option name="number" value="00004" />
+--      <option name="presentableId" value="LOCAL-00004" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774281971115</updated>
+--    </task>
+--    <option name="localTasksCounter" value="5" />
+-+    <option name="localTasksCounter" value="3" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -128,7 +120,6 @@
+-   </component>
+-   <component name="VcsManagerConfiguration">
+-     <MESSAGE value="dd" />
+--    <MESSAGE value="Step 3 good" />
+--    <option name="LAST_COMMIT_MESSAGE" value="Step 3 good" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="dd" />
+-   </component>
+- </project>
+-\ No newline at end of file
+-diff --git a/SSchengenAirports b/SSchengenAirports
+-new file mode 100644
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,93 +0,0 @@
+-Index: LoadAriports.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>def LoadAirports(Airportsfile):\r\n    F = open(\"Airports\", \"r\")\r\n    airport = F.readline()\r\n    while airport != \"\":\r\n        elementos = airport.split(\" \")\r\n        Aeropuerto = str(elementos[0])\r\n        Lat = str(elementos[1])\r\n        Lon = str(elementos[2])\r\n        sur = False\r\n        latutud = 0\r\n        if Lat[0] == \"S\":\r\n            sur = True\r\n        else:\r\n            sur = False\r\n        oeste = false\r\n        if Lon[0] == \"W\":\r\n            oeste = True\r\n        else:\r\n            oeste = False\r\n        if sur == false:\r\n            latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600\r\n\r\n\r\n    F.close()\r\n\r\nprint(float(LatB))\r\n\r\n\r\n\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/LoadAriports.py b/LoadAriports.py
+---- a/LoadAriports.py	(revision 373438c9ccca78f5bad1c261b5b00ef9142e20ab)
+-+++ b/LoadAriports.py	(date 1774278016914)
+-@@ -17,13 +17,13 @@
+-             oeste = True
+-         else:
+-             oeste = False
+--        if sur == false:
+-+        if sur = False:
+-             latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600
+- 
+- 
+-     F.close()
+- 
+--print(float(LatB))
+-+print(float(latitud))
+- 
+- 
+- 
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/LoadAirports\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airportsfile\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main.py\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/test_airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/test_airport.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\r\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Airport.executor\": \"Run\",\r\n    \"Python.test_airport.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"Version-1\",\r\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\r\n      <created>1774092634606</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774092634606</updated>\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"Version-1\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 373438c9ccca78f5bad1c261b5b00ef9142e20ab)
+-+++ b/.idea/workspace.xml	(date 1774277955211)
+-@@ -1,12 +1,9 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-   <component name="ChangeListManager">
+--    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
+--      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/LoadAirports" beforeDir="false" afterPath="$PROJECT_DIR$/Airportsfile" afterDir="false" />
+-+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="dd">
+-+      <change beforePath="$PROJECT_DIR$/Airportsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Airportsfile" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/test_airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_airport.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -47,6 +44,7 @@
+-   "keyToString": {
+-     "ModuleVcsDetector.initialDetectionPerformed": "true",
+-     "Python.Airport.executor": "Run",
+-+    "Python.LoadAriports.executor": "Run",
+-     "Python.test_airport.executor": "Run",
+-     "RunOnceActivity.ShowReadmeOnStart": "true",
+-     "RunOnceActivity.git.unshallow": "true",
+-@@ -69,6 +67,23 @@
+-       <option name="presentableId" value="Default" />
+-       <updated>1774092634606</updated>
+-     </task>
+-+    <task id="LOCAL-00001" summary="dd">
+-+      <option name="closed" value="true" />
+-+      <created>1774277154644</created>
+-+      <option name="number" value="00001" />
+-+      <option name="presentableId" value="LOCAL-00001" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774277154644</updated>
+-+    </task>
+-+    <task id="LOCAL-00002" summary="dd">
+-+      <option name="closed" value="true" />
+-+      <created>1774277266144</created>
+-+      <option name="number" value="00002" />
+-+      <option name="presentableId" value="LOCAL-00002" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774277266144</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="3" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -94,4 +109,8 @@
+-       </map>
+-     </option>
+-   </component>
+-+  <component name="VcsManagerConfiguration">
+-+    <MESSAGE value="dd" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="dd" />
+-+  </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]" date="1774273440416" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 23/03/2026 14:43 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_03_2026_11_51_[Changes]1/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,97 +0,0 @@
+-Index: Addairportcode.py
+-===================================================================
+-diff --git a/Addairportcode.py b/Addairportcode.py
+-new file mode 100644
+---- /dev/null	(date 1774348880423)
+-+++ b/Addairportcode.py	(date 1774348880423)
+-@@ -0,0 +1,25 @@
+-+def AddAirport(Airportsfile,Airport):
+-+    code = str(input("ICAO code of the Airport: ")).upper()
+-+    Newlat = float(input("Latitude of the Airport: "))
+-+    Newlong = float(input("Longitude of the Airport: "))
+-+    F = open(Airportsfile,"a")
+-+    next(F)
+-+    Writtenairports = F.readline()
+-+    elements = Writtenairports.split()
+-+    if elements[0] == code:
+-+        F.write(code + " " + Newlat + " " + Newlong + "\n")
+-+        print("Airport already saved")
+-+    else:
+-+        while elements[0] != code and Writtenairports != "":
+-+            if elements[0] == code:
+-+                F.write(code + " " + Newlat + " " + Newlong + "\n")
+-+                print("Saved")
+-+            else:
+-+                F.readline()
+-+                Writtenairports = F.readline()
+-+                elements = Writtenairports.split()
+-+    F.close()
+-+
+-+
+-+
+-+
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\r\n      <change afterPath=\"$PROJECT_DIR$/Prova saveschengenairports.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airport.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/SSchengenAirports\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/SSchengenAirports\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\r\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Airport.executor\": \"Run\",\r\n    \"Python.LoadAriports.executor\": \"Run\",\r\n    \"Python.Prova saveschengenairports.executor\": \"Run\",\r\n    \"Python.test_airport.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"Version-1\",\r\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\r\n      <created>1774092634606</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774092634606</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"dd\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774278302493</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774278302493</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"dd\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774278984622</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774278984622</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774281642680</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774281642680</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774281971115</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774281971115</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774283570735</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774283570735</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774286268511</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774286268511</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"7\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"Version-1\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"dd\" />\r\n    <MESSAGE value=\"Step 3 good\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 90f406e2305ac7419b087de10039aa522786a991)
+-+++ b/.idea/workspace.xml	(date 1774349441881)
+-@@ -2,10 +2,9 @@
+- <project version="4">
+-   <component name="ChangeListManager">
+-     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+--      <change afterPath="$PROJECT_DIR$/Prova saveschengenairports.py" afterDir="false" />
+-+      <change afterPath="$PROJECT_DIR$/Addairportcode.py" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/Airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/Airport.py" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/SSchengenAirports" beforeDir="false" afterPath="$PROJECT_DIR$/SSchengenAirports" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/Prova saveschengenairports.py" beforeDir="false" afterPath="$PROJECT_DIR$/Provasaveschengenairports.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -45,9 +44,12 @@
+-   <component name="PropertiesComponent"><![CDATA[{
+-   "keyToString": {
+-     "ModuleVcsDetector.initialDetectionPerformed": "true",
+-+    "Python.Addairportcode.executor": "Run",
+-     "Python.Airport.executor": "Run",
+-     "Python.LoadAriports.executor": "Run",
+-     "Python.Prova saveschengenairports.executor": "Run",
+-+    "Python.Provasaveschengenairports.executor": "Run",
+-+    "Python.Remove airport code.executor": "Run",
+-     "Python.test_airport.executor": "Run",
+-     "RunOnceActivity.ShowReadmeOnStart": "true",
+-     "RunOnceActivity.git.unshallow": "true",
+-@@ -55,6 +57,11 @@
+-     "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
+-   }
+- }]]></component>
+-+  <component name="RecentsManager">
+-+    <key name="MoveFile.RECENT_KEYS">
+-+      <recent name="C:\Users\maike\Documents\GitHub\Project_INFO1-Group_15" />
+-+    </key>
+-+  </component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+-@@ -118,7 +125,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774286268511</updated>
+-     </task>
+--    <option name="localTasksCounter" value="7" />
+-+    <task id="LOCAL-00007" summary="Step 3 good">
+-+      <option name="closed" value="true" />
+-+      <created>1774346847873</created>
+-+      <option name="number" value="00007" />
+-+      <option name="presentableId" value="LOCAL-00007" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774346847873</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="8" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,58 +0,0 @@
+-Index: LoadAriports.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>def LoadAirports(Airportsfile):\n    F = open(\"Airports\", \"r\")\n    airport = F.readline()\n    while airport != \"\":\n        elementos = airport.split(\" \")\n        Aeropuerto = str(elementos[0])\n        Lat = str(elementos[1])\n        Lon = str(elementos[2])\n        sur = False\n        latitud = 0\n        oeste = False\n        if Lat[0] == \"S\":\n            sur = True\n        else:\n            sur = False\n        if Lon[0] == \"W\":\n            oeste = True\n        else:\n            oeste = False\n        if sur == false:\n            latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600\n\n\n    F.close()\n\nprint(float(Latitud))\n\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/LoadAriports.py b/LoadAriports.py
+---- a/LoadAriports.py	(revision 00063b2cd178551975db3853bc5d604646da8084)
+-+++ b/LoadAriports.py	(date 1774278212728)
+-@@ -23,7 +23,7 @@
+- 
+-     F.close()
+- 
+--print(float(Latitud))
+-+print(float(latitud))
+- 
+- 
+- 
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"a\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774277351903</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774277351903</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"2\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"a\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"a\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 00063b2cd178551975db3853bc5d604646da8084)
+-+++ b/.idea/workspace.xml	(date 1774278327224)
+-@@ -1,7 +1,10 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-+  <component name="AutoImportSettings">
+-+    <option name="autoReloadType" value="SELECTIVE" />
+-+  </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
+-+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="a">
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-     </list>
+-@@ -79,7 +82,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774277351903</updated>
+-     </task>
+--    <option name="localTasksCounter" value="2" />
+-+    <task id="LOCAL-00002" summary="a">
+-+      <option name="closed" value="true" />
+-+      <created>1774278023347</created>
+-+      <option name="number" value="00002" />
+-+      <option name="presentableId" value="LOCAL-00002" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774278023347</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="3" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__16_16__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__16_16__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__16_16__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__16_16__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]" date="1774278997752" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_16_16_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 23/3/26, 16:16 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__11_14__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__11_14__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__11_14__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__11_14__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]" date="1774347289530" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_11_14_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 24/3/26, 11:14 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26__11_51__Changes_1.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26__11_51__Changes_1.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26__11_51__Changes_1.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26__11_51__Changes_1.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1" date="1774349487244" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 24/3/26, 11:51 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,99 +0,0 @@
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\n      <change afterPath=\"$PROJECT_DIR$/Step 5?.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/test_airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/test_airport.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"Version-1\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\n  \"selectedUrlAndAccountId\": {\n    \"url\": \"https://github.com/manelruizflorit/Project_INFO1-Group_15.git\",\n    \"accountId\": \"59e82cf3-2835-42d9-95ba-334c1b126cca\"\n  }\n}]]></component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.Prova saveschengenairports.executor\": \"Run\",\n    \"Python.airport.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.MCP Project settings loaded\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\n    \"git-widget-placeholder\": \"Version---1--sharuk\",\n    \"junie.onboarding.icon.badge.shown\": \"true\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\",\n    \"to.speed.mode.migration.done\": \"true\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774283570735</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774283570735</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774286268511</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774286268511</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"7\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision ed22ed57813c083bbbca33391f21f3814b93ed9d)
+-+++ b/.idea/workspace.xml	(date 1774355854151)
+-@@ -5,9 +5,8 @@
+-   </component>
+-   <component name="ChangeListManager">
+-     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+--      <change afterPath="$PROJECT_DIR$/Step 5?.py" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/test_airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_airport.py" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/Step 5?.py" beforeDir="false" afterPath="$PROJECT_DIR$/Step 5?.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -35,12 +34,12 @@
+-     &quot;assignee&quot;: &quot;manelruizflorit&quot;
+-   }
+- }</component>
+--  <component name="GithubPullRequestsUISettings"><![CDATA[{
+--  "selectedUrlAndAccountId": {
+--    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
+--    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+--  }
+--}]]></component>
+-+  <component name="GithubPullRequestsUISettings">{
+-+  &quot;selectedUrlAndAccountId&quot;: {
+-+    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+-+    &quot;accountId&quot;: &quot;59e82cf3-2835-42d9-95ba-334c1b126cca&quot;
+-+  }
+-+}</component>
+-   <component name="McpProjectServerCommands">
+-     <commands />
+-     <urls />
+-@@ -53,24 +52,24 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent"><![CDATA[{
+--  "keyToString": {
+--    "ModuleVcsDetector.initialDetectionPerformed": "true",
+--    "Python.Airport.executor": "Run",
+--    "Python.LoadAriports.executor": "Run",
+--    "Python.Prova saveschengenairports.executor": "Run",
+--    "Python.airport.executor": "Run",
+--    "Python.test_airport.executor": "Run",
+--    "RunOnceActivity.MCP Project settings loaded": "true",
+--    "RunOnceActivity.ShowReadmeOnStart": "true",
+--    "RunOnceActivity.git.unshallow": "true",
+--    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+--    "git-widget-placeholder": "Version---1--sharuk",
+--    "junie.onboarding.icon.badge.shown": "true",
+--    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
+--    "to.speed.mode.migration.done": "true"
+-+  <component name="PropertiesComponent">{
+-+  &quot;keyToString&quot;: {
+-+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+-+    &quot;Python.Airport.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.airport.executor&quot;: &quot;Run&quot;,
+-+    &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,
+-+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+-+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+-+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+-+    &quot;git-widget-placeholder&quot;: &quot;Version---1--sharuk&quot;,
+-+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+-+    &quot;last_opened_file_path&quot;: &quot;C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15&quot;,
+-+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+-   }
+--}]]></component>
+-+}</component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+-@@ -134,7 +133,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774286268511</updated>
+-     </task>
+--    <option name="localTasksCounter" value="7" />
+-+    <task id="LOCAL-00007" summary="Step 3 good">
+-+      <option name="closed" value="true" />
+-+      <created>1774350490280</created>
+-+      <option name="number" value="00007" />
+-+      <option name="presentableId" value="LOCAL-00007" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774350490280</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="8" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__13_37__Changes_1.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__13_37__Changes_1.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__13_37__Changes_1.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26__13_37__Changes_1.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1" date="1774355865741" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_24_3_26,_13_37_[Changes]1/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 24/3/26, 13:37 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_24_3_26,_11_51_[Changes]1/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,150 +0,0 @@
+-Index: Airport.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>class Airport:\n    def __init__(self, code: str, latitude:float , longitude: float):\n        if len(code) != 4:\n            raise ValueError(\"Invalid ICAO code\")\n        self.code = code.upper()\n        self.latitude = latitude\n        self.longitude = longitude\n        self.schengen = False\ndef IsSchengenAirport(code):\n    if  not code:\n        return False\n    codigos = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH', 'BI', 'LI', 'EV', 'EY', 'EL', 'LM', 'EN', 'EP', 'LP', 'LZ', 'LJ', 'LE', 'ES', 'LS']\n    encontrado = False\n    i = 0\n    while i < len(codigos) and not encontrado:\n        if codigos[i] == code[0:2]:\n            encontrado = True\n        else:\n            i += 1\n    if encontrado:\n        return True\ndef SetSchengen(airport: Airport):\n    airport.schengen = IsSchengenAirport(airport.code)\ndef PrintAirport(airport: Airport):\n    print(\"Airport code: \", airport.code)\n    print(\"Latitude: \", airport.latitude)\n    print(\"Longitude: \", airport.longitude)\n    print(\"Schengen: \", airport.schengen)\n\ndef LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\n\n\ndef SaveSchengenAirports(Airportsfile, SSchengenAirports):\n    F = open(Airportsfile, \"r\")\n    Q = open(SSchengenAirports, \"w\")\n    if len(Airportsfile) == 0:\n        print(\"No Airports file\")\n    capçalera = F.readline()\n    Q.write(capçalera)\n    Aeropuerto = F.readline()\n    while Aeropuerto != \"\":\n        elementos = Aeropuerto.split(\" \")\n        if IsSchengenAirport(elementos[0]) == True:\n            Q.write(Aeropuerto)\n        Aeropuerto = F.readline()\n    Q.close()\n    F.close()\n\n\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/Airport.py b/Airport.py
+---- a/Airport.py	(revision 90f406e2305ac7419b087de10039aa522786a991)
+-+++ b/Airport.py	(date 1774347286973)
+-@@ -49,23 +49,18 @@
+-     F.close()
+- 
+- 
+--def SaveSchengenAirports(Airportsfile, SSchengenAirports):
+-+def SaveSchengenAirports(Airportsfile, schengenAirports):
+-     F = open(Airportsfile, "r")
+--    Q = open(SSchengenAirports, "w")
+--    if len(Airportsfile) == 0:
+--        print("No Airports file")
+--    capçalera = F.readline()
+--    Q.write(capçalera)
+-     Aeropuerto = F.readline()
+-+    Q = open("schengenAirports.txt", "w")
+-     while Aeropuerto != "":
+-         elementos = Aeropuerto.split(" ")
+-         if IsSchengenAirport(elementos[0]) == True:
+-             Q.write(Aeropuerto)
+--        Aeropuerto = F.readline()
+-+            next(Q)
+-     Q.close()
+-     F.close()
+--
+--
+-+SaveSchengenAirports(Airportsfile.txt,schengenAirports)
+- 
+- 
+- 
+-Index: RemoveAirport.py
+-===================================================================
+-diff --git a/RemoveAirport.py b/RemoveAirport.py
+-new file mode 100644
+---- /dev/null	(date 1774348446037)
+-+++ b/RemoveAirport.py	(date 1774348446037)
+-@@ -0,0 +1,14 @@
+-+def RemoveAirport(Airportsfile, code):
+-+    code = str(input("Enter Airport ICAO Code, Latitude and Longitude: "))
+-+    P = open(Airportsfile, "r")
+-+    Aeropuertos = P.readline()
+-+    while code != Aeropuertos and code != "":
+-+        Aeropuertos = P.readline()
+-+    if code == Aeropuertos:
+-+        P.
+-+
+-+    if code == "":
+-+
+-+
+-+
+-+
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\n      <change afterPath=\"$PROJECT_DIR$/Prova saveschengenairports.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/Airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airport.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/SSchengenAirports\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/SSchengenAirports\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.Prova saveschengenairports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774283570735</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774283570735</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774286268511</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774286268511</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"7\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 90f406e2305ac7419b087de10039aa522786a991)
+-+++ b/.idea/workspace.xml	(date 1774347887535)
+-@@ -1,10 +1,14 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-+  <component name="AutoImportSettings">
+-+    <option name="autoReloadType" value="SELECTIVE" />
+-+  </component>
+-   <component name="ChangeListManager">
+-     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+--      <change afterPath="$PROJECT_DIR$/Prova saveschengenairports.py" afterDir="false" />
+-+      <change afterPath="$PROJECT_DIR$/RemoveAirport.py" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/Airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/Airport.py" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/SSchengenAirports" beforeDir="false" afterPath="$PROJECT_DIR$/SSchengenAirports" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-@@ -28,12 +32,16 @@
+-     &quot;assignee&quot;: &quot;manelruizflorit&quot;
+-   }
+- }</component>
+--  <component name="GithubPullRequestsUISettings">{
+--  &quot;selectedUrlAndAccountId&quot;: {
+--    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+--    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
+-+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-+  "selectedUrlAndAccountId": {
+-+    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
+-+    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+-   }
+--}</component>
+-+}]]></component>
+-+  <component name="McpProjectServerCommands">
+-+    <commands />
+-+    <urls />
+-+  </component>
+-   <component name="ProjectColorInfo">{
+-   &quot;associatedIndex&quot;: 2
+- }</component>
+-@@ -47,12 +55,15 @@
+-     "ModuleVcsDetector.initialDetectionPerformed": "true",
+-     "Python.Airport.executor": "Run",
+-     "Python.LoadAriports.executor": "Run",
+--    "Python.Prova saveschengenairports.executor": "Run",
+-     "Python.test_airport.executor": "Run",
+-+    "RunOnceActivity.MCP Project settings loaded": "true",
+-     "RunOnceActivity.ShowReadmeOnStart": "true",
+-     "RunOnceActivity.git.unshallow": "true",
+-+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-     "git-widget-placeholder": "Version-1",
+--    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
+-+    "junie.onboarding.icon.badge.shown": "true",
+-+    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
+-+    "to.speed.mode.migration.done": "true"
+-   }
+- }]]></component>
+-   <component name="SharedIndexes">
+-@@ -102,23 +113,7 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774281971115</updated>
+-     </task>
+--    <task id="LOCAL-00005" summary="Step 3 good">
+--      <option name="closed" value="true" />
+--      <created>1774283570735</created>
+--      <option name="number" value="00005" />
+--      <option name="presentableId" value="LOCAL-00005" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774283570735</updated>
+--    </task>
+--    <task id="LOCAL-00006" summary="Step 3 good">
+--      <option name="closed" value="true" />
+--      <created>1774286268511</created>
+--      <option name="number" value="00006" />
+--      <option name="presentableId" value="LOCAL-00006" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774286268511</updated>
+--    </task>
+--    <option name="localTasksCounter" value="7" />
+-+    <option name="localTasksCounter" value="5" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,133 +0,0 @@
+-Index: LoadAriports.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>def LoadAirports(Airportsfile):\n    F = open(\"Airports\", \"r\")\n    airport = F.readline()\n    Lat = [0]*7\n    while airport != \"\":\n        elementos = airport.split(\" \")\n        Aeropuerto = elementos[0]\n        Lat = eval(str(elementos[1]))\n        Lon = str(elementos[2])\n        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)\n        if Lat[0] == \"S\":\n            latitud *= -1\n    F.close()\n\nprint(Lat)\n\n\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/LoadAriports.py b/LoadAriports.py
+---- a/LoadAriports.py	(revision 9141267eb85915f0b2ad61d33ae5f0bf363c50cc)
+-+++ b/LoadAriports.py	(date 1774278995146)
+-@@ -1,19 +1,29 @@
+- def LoadAirports(Airportsfile):
+-     F = open("Airports", "r")
+-     airport = F.readline()
+--    Lat = [0]*7
+-     while airport != "":
+-         elementos = airport.split(" ")
+--        Aeropuerto = elementos[0]
+--        Lat = eval(str(elementos[1]))
+-+        Aeropuerto = str(elementos[0])
+-+        Lat = str(elementos[1])
+-         Lon = str(elementos[2])
+--        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)
+-+        sur = False
+-+        latitud = 0
+-+        oeste = False
+-         if Lat[0] == "S":
+--            latitud *= -1
+-+            sur = True
+-+        else:
+-+            sur = False
+-+        if Lon[0] == "W":
+-+            oeste = True
+-+        else:
+-+            oeste = False
+-+        if sur == false:
+-+            latitud = Lat[1,2]+(lat[3,4])/60 + (lat[5,6])/3600
+-+
+-+
+-     F.close()
+- 
+--print(Lat)
+--
+-+print(float(Latitud))
+- 
+- 
+- 
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 9141267eb85915f0b2ad61d33ae5f0bf363c50cc)
+-+++ b/.idea/workspace.xml	(date 1774280556971)
+-@@ -1,7 +1,10 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-+  <component name="AutoImportSettings">
+-+    <option name="autoReloadType" value="SELECTIVE" />
+-+  </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
+-+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="a">
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-     </list>
+-@@ -26,12 +29,16 @@
+-     &quot;assignee&quot;: &quot;manelruizflorit&quot;
+-   }
+- }</component>
+--  <component name="GithubPullRequestsUISettings">{
+--  &quot;selectedUrlAndAccountId&quot;: {
+--    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
+--    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
+-+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-+  "selectedUrlAndAccountId": {
+-+    "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
+-+    "accountId": "59e82cf3-2835-42d9-95ba-334c1b126cca"
+-   }
+--}</component>
+-+}]]></component>
+-+  <component name="McpProjectServerCommands">
+-+    <commands />
+-+    <urls />
+-+  </component>
+-   <component name="ProjectColorInfo">{
+-   &quot;associatedIndex&quot;: 2
+- }</component>
+-@@ -46,10 +53,14 @@
+-     "Python.Airport.executor": "Run",
+-     "Python.LoadAriports.executor": "Run",
+-     "Python.test_airport.executor": "Run",
+-+    "RunOnceActivity.MCP Project settings loaded": "true",
+-     "RunOnceActivity.ShowReadmeOnStart": "true",
+-     "RunOnceActivity.git.unshallow": "true",
+-+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-     "git-widget-placeholder": "Version-1",
+--    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15"
+-+    "junie.onboarding.icon.badge.shown": "true",
+-+    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
+-+    "to.speed.mode.migration.done": "true"
+-   }
+- }]]></component>
+-   <component name="SharedIndexes">
+-@@ -67,6 +78,15 @@
+-       <option name="presentableId" value="Default" />
+-       <updated>1774092634606</updated>
+-     </task>
+-+    <task id="LOCAL-00001" summary="a">
+-+      <option name="closed" value="true" />
+-+      <created>1774277351903</created>
+-+      <option name="number" value="00001" />
+-+      <option name="presentableId" value="LOCAL-00001" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774277351903</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="2" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -92,4 +112,8 @@
+-       </map>
+-     </option>
+-   </component>
+-+  <component name="VcsManagerConfiguration">
+-+    <MESSAGE value="a" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="a" />
+-+  </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,75 +0,0 @@
+-Index: GoogleEarthfunction.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/GoogleEarthfunction.py b/GoogleEarthfunction.py
+---- a/GoogleEarthfunction.py	(revision 9e0205c0de910cc0d04b12908e8f4b466e760c7e)
+-+++ b/GoogleEarthfunction.py	(date 1774435610634)
+-@@ -1,0 +1,3 @@
+-+import matplotlib.pyplot as plt
+-+import pandas as pd
+-+import seaborn as sns
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"Step 3 good\">\n      <change beforePath=\"$PROJECT_DIR$/airport.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/airport.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"Version-1\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;59e82cf3-2835-42d9-95ba-334c1b126cca&quot;\n  }\n}</component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\n    &quot;Python.Airport.executor&quot;: &quot;Run&quot;,\n    &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,\n    &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,\n    &quot;Python.airport.executor&quot;: &quot;Run&quot;,\n    &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,\n    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\n    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,\n    &quot;git-widget-placeholder&quot;: &quot;Version---1--sharuk&quot;,\n    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15&quot;,\n    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;\n  }\n}</component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774283570735</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774283570735</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774286268511</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774286268511</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"7\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 3 good\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 9e0205c0de910cc0d04b12908e8f4b466e760c7e)
+-+++ b/.idea/workspace.xml	(date 1774435633546)
+-@@ -5,7 +5,8 @@
+-   </component>
+-   <component name="ChangeListManager">
+-     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Step 3 good">
+--      <change beforePath="$PROJECT_DIR$/airport.py" beforeDir="false" afterPath="$PROJECT_DIR$/airport.py" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/GoogleEarthfunction.py" beforeDir="false" afterPath="$PROJECT_DIR$/GoogleEarthfunction.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -51,24 +52,25 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent">{
+--  &quot;keyToString&quot;: {
+--    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+--    &quot;Python.Airport.executor&quot;: &quot;Run&quot;,
+--    &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,
+--    &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,
+--    &quot;Python.airport.executor&quot;: &quot;Run&quot;,
+--    &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,
+--    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+--    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+--    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+--    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+--    &quot;git-widget-placeholder&quot;: &quot;Version---1--sharuk&quot;,
+--    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+--    &quot;last_opened_file_path&quot;: &quot;C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15&quot;,
+--    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+-+  <component name="PropertiesComponent"><![CDATA[{
+-+  "keyToString": {
+-+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+-+    "Python.Airport.executor": "Run",
+-+    "Python.GoogleEarthfunction.executor": "Run",
+-+    "Python.LoadAriports.executor": "Run",
+-+    "Python.Prova saveschengenairports.executor": "Run",
+-+    "Python.airport.executor": "Run",
+-+    "Python.test_airport.executor": "Run",
+-+    "RunOnceActivity.MCP Project settings loaded": "true",
+-+    "RunOnceActivity.ShowReadmeOnStart": "true",
+-+    "RunOnceActivity.git.unshallow": "true",
+-+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-+    "git-widget-placeholder": "Version---1--sharuk",
+-+    "junie.onboarding.icon.badge.shown": "true",
+-+    "last_opened_file_path": "C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15",
+-+    "to.speed.mode.migration.done": "true"
+-   }
+--}</component>
+-+}]]></component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,61 +0,0 @@
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"canvis\">\r\n      <change beforePath=\"$PROJECT_DIR$/Version-1.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Version-1.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/manelruizflorit/Project_INFO1-Group_15.git\",\r\n    \"accountId\": \"d401ea14-3304-4aaa-9efc-db1c8e31c008\"\r\n  }\r\n}]]></component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFmu5Ginb5ewoTmMVLhOMOY758\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Version-1.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"Version-1\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"\" />\r\n      <created>1774093414535</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774093414535</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177515358</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177515358</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177763784</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177763784</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177798551</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177798551</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177882413</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177882413</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"canvis\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"canvis\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision c58720efd63ad20fde72e1878306f100a74f90bb)
+-+++ b/.idea/workspace.xml	(date 1774179483620)
+-@@ -1,9 +1,7 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-   <component name="ChangeListManager">
+--    <list default="true" id="95b10fe3-2dbe-42b7-9756-cd6c7988079b" name="Changes" comment="canvis">
+--      <change beforePath="$PROJECT_DIR$/Version-1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Version-1.py" afterDir="false" />
+--    </list>
+-+    <list default="true" id="95b10fe3-2dbe-42b7-9756-cd6c7988079b" name="Changes" comment="Canvi de prova" />
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+-@@ -12,6 +10,12 @@
+-   <component name="Git.Settings">
+-     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+-   </component>
+-+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-+  "lastFilter": {
+-+    "state": "OPEN",
+-+    "assignee": "manelruizflorit"
+-+  }
+-+}]]></component>
+-   <component name="GithubPullRequestsUISettings"><![CDATA[{
+-   "selectedUrlAndAccountId": {
+-     "url": "https://github.com/manelruizflorit/Project_INFO1-Group_15.git",
+-@@ -83,7 +87,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774177882413</updated>
+-     </task>
+--    <option name="localTasksCounter" value="5" />
+-+    <task id="LOCAL-00005" summary="Canvi de prova">
+-+      <option name="closed" value="true" />
+-+      <created>1774178106827</created>
+-+      <option name="number" value="00005" />
+-+      <option name="presentableId" value="LOCAL-00005" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774178106827</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="6" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -99,6 +111,7 @@
+-   </component>
+-   <component name="VcsManagerConfiguration">
+-     <MESSAGE value="canvis" />
+--    <option name="LAST_COMMIT_MESSAGE" value="canvis" />
+-+    <MESSAGE value="Canvi de prova" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="Canvi de prova" />
+-   </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_14_43_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,55 +0,0 @@
+-Index: Version-1.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>class Airport:\r\n    def __init__(self, code: str, latitude:float , longitude: float):\r\n        if len(code) != 4:\r\n            raise ValueError(\"Invalid ICAO code\")\r\n        self.code = code.upper()\r\n        self.latitude = latitude\r\n        self.longitude = longitude\r\n        self.schengen = False\r\ndef IsSchengenAirport(code):\r\n    if  not code:\r\n        return False\r\n    codigos = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH', 'BI', 'LI', 'EV', 'EY', 'EL', 'LM', 'EN', 'EP', 'LP', 'LZ', 'LJ', 'LE', 'ES', 'LS']\r\n    encontrado = False\r\n    i = 0\r\n    while i < len(codigos) and not encontrado:\r\n        if codigos[i] == code[0:2]:\r\n            encontrado = True\r\n        else:\r\n            i += 1\r\n    if encontrado:\r\n        return True\r\ndef SetSchengen(airport: Airport):\r\n    airport.schengen = IsSchengenAirport(airport.code)\r\ndef PrintAirport(airport: Airport):\r\n    print(\"Airport code: \", airport.code)\r\n    print(\"Latitude: \", airport.latitude)\r\n    print(\"Longitude: \", airport.longitude)\r\n    print(\"Schengen: \", airport.schengen)\r\n\r\n\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/Version-1.py b/Version-1.py
+---- a/Version-1.py	(revision 8eb07550c404913edc284d60cc6042d0c62eb9a8)
+-+++ b/Version-1.py	(date 1774269717986)
+-@@ -25,7 +25,4 @@
+-     print("Airport code: ", airport.code)
+-     print("Latitude: ", airport.latitude)
+-     print("Longitude: ", airport.longitude)
+--    print("Schengen: ", airport.schengen)
+--
+--
+--
+-+    print("Schengen: ", airport.schengen)
+-\ No newline at end of file
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"Step 1\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Version-1.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Version-1.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"manelruizflorit\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\r\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BFmu5Ginb5ewoTmMVLhOMOY758\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;Python.Version-1.executor&quot;: &quot;Run&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;Version-1&quot;\r\n  }\r\n}</component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"95b10fe3-2dbe-42b7-9756-cd6c7988079b\" name=\"Changes\" comment=\"\" />\r\n      <created>1774093414535</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1774093414535</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177515358</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177515358</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177763784</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177763784</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177798551</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177798551</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"canvis\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774177882413</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774177882413</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Canvi de prova\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774179549828</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774179549828</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Step 1\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774266969826</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774266969826</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"7\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"canvis\" />\r\n    <MESSAGE value=\"Canvi de prova\" />\r\n    <MESSAGE value=\"Step 1\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Step 1\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 8eb07550c404913edc284d60cc6042d0c62eb9a8)
+-+++ b/.idea/workspace.xml	(date 1774269718177)
+-@@ -2,7 +2,6 @@
+- <project version="4">
+-   <component name="ChangeListManager">
+-     <list default="true" id="95b10fe3-2dbe-42b7-9756-cd6c7988079b" name="Changes" comment="Step 1">
+--      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/Version-1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Version-1.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-@@ -106,7 +105,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1774266969826</updated>
+-     </task>
+--    <option name="localTasksCounter" value="7" />
+-+    <task id="LOCAL-00007" summary="Step 1">
+-+      <option name="closed" value="true" />
+-+      <created>1774269698582</created>
+-+      <option name="number" value="00007" />
+-+      <option name="presentableId" value="LOCAL-00007" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1774269698582</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="8" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_33__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_33__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_33__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_33__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]" date="1774283583068" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 23/3/26, 17:33 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_25_3_26__11_48__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26__11_48__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26__11_48__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26__11_48__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]" date="1774435695129" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_25_3_26,_11_48_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 25/3/26, 11:48 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]" date="1774179524833" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_03_2026_12_38_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 22/03/2026 12:38 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]" date="1774278034944" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_03_2026_16_00_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 23/03/2026 16:00 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_31__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_31__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_31__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26__17_31__Changes_.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]" date="1774283484163" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_31_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 23/3/26, 17:31 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_23_3_26,_17_33_[Changes]/shelved.patch	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ /dev/null	(revision 0d65d5e933743516babebc656445432c9df342eb)
+@@ -1,108 +0,0 @@
+-Index: LoadAriports.py
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>def LoadAirports(Airportsfile):\n    F = open(\"Airportsfile\", \"r\")\n    next(F)\n    Aerodatos = F.readline()\n    while Aerodatos != \"\":\n        elementos = Aerodatos.split(\" \")\n        ICAO = elementos[0]\n        Latitude = elementos[1]\n        Longitude = elementos[2]\n        Lat_signe = 1\n        Long_signe = 1\n        if Latitude[0] == \"S\":\n            Lat_signe = -1\n        if Longitude[0] == \"W\":\n            Long_signe = -1\n        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe\n        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe\n        print(ICAO + \" \" + str(latitud) + \" \" + str(longitud))\n        Aerodatos = F.readline()\n    F.close()\nLoadAirports(\"Airportsfile.txt\")\n\n\n\n\n\n\n\n\n\n\n\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/LoadAriports.py b/LoadAriports.py
+---- a/LoadAriports.py	(revision e809aaa232d40b4019ee814f403adc0ab51a2f5e)
+-+++ b/LoadAriports.py	(date 1774283481667)
+-@@ -1,30 +1,18 @@
+- def LoadAirports(Airportsfile):
+--    F = open("Airportsfile", "r")
+--    next(F)
+--    Aerodatos = F.readline()
+--    while Aerodatos != "":
+--        elementos = Aerodatos.split(" ")
+--        ICAO = elementos[0]
+--        Latitude = elementos[1]
+--        Longitude = elementos[2]
+--        Lat_signe = 1
+--        Long_signe = 1
+--        if Latitude[0] == "S":
+--            Lat_signe = -1
+--        if Longitude[0] == "W":
+--            Long_signe = -1
+--        latitud = (float(Latitude[1:3]) + float(Latitude[3:5])/60 + float(Latitude[5:7])/3600)*Lat_signe
+--        longitud = (float(Longitude[1:3]) + float(Longitude[3:5])/60 + float(Longitude[5:7])/3600)*Long_signe
+--        print(ICAO + " " + str(latitud) + " " + str(longitud))
+--        Aerodatos = F.readline()
+-+    F = open("Airports", "r")
+-+    airport = F.readline()
+-+    Lat = [0]*7
+-+    while airport != "":
+-+        elementos = airport.split(" ")
+-+        Aeropuerto = elementos[0]
+-+        Lat = eval(str(elementos[1]))
+-+        Lon = str(elementos[2])
+-+        latitud = float(Lat[1, 2] + (Lat[3, 4]) / 60 + (Lat[5, 6]) / 3600)
+-+        if Lat[0] == "S":
+-+            latitud *= -1
+-     F.close()
+--LoadAirports("Airportsfile.txt")
+--
+- 
+--
+--
+--
+--
+-+print(Lat)
+- 
+- 
+- 
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"dd\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/Airportsfile\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Airportsfile\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/LoadAriports.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/LoadAriports.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"Python.Airport.executor\": \"Run\",\n    \"Python.LoadAriports.executor\": \"Run\",\n    \"Python.test_airport.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Version-1\",\n    \"last_opened_file_path\": \"C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"3\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"dd\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision e809aaa232d40b4019ee814f403adc0ab51a2f5e)
+-+++ b/.idea/workspace.xml	(date 1774283484123)
+-@@ -1,9 +1,8 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-   <component name="ChangeListManager">
+--    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="dd">
+-+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="">
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/Airportsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Airportsfile" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/LoadAriports.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadAriports.py" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-@@ -68,23 +67,6 @@
+-       <option name="presentableId" value="Default" />
+-       <updated>1774092634606</updated>
+-     </task>
+--    <task id="LOCAL-00001" summary="dd">
+--      <option name="closed" value="true" />
+--      <created>1774278302493</created>
+--      <option name="number" value="00001" />
+--      <option name="presentableId" value="LOCAL-00001" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774278302493</updated>
+--    </task>
+--    <task id="LOCAL-00002" summary="dd">
+--      <option name="closed" value="true" />
+--      <created>1774278984622</created>
+--      <option name="number" value="00002" />
+--      <option name="presentableId" value="LOCAL-00002" />
+--      <option name="project" value="LOCAL" />
+--      <updated>1774278984622</updated>
+--    </task>
+--    <option name="localTasksCounter" value="3" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -110,8 +92,4 @@
+-       </map>
+-     </option>
+-   </component>
+--  <component name="VcsManagerConfiguration">
+--    <MESSAGE value="dd" />
+--    <option name="LAST_COMMIT_MESSAGE" value="dd" />
+--  </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"N\" />\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"Version-1\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;manelruizflorit&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,\n    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;\n  }\n}</component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"3BFlKOzfZRrdEi9BZVfccWQy9Hc\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\n    &quot;Python.Airport.executor&quot;: &quot;Run&quot;,\n    &quot;Python.GoogleEarthfunction.executor&quot;: &quot;Run&quot;,\n    &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,\n    &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,\n    &quot;Python.airport.executor&quot;: &quot;Run&quot;,\n    &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,\n    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\n    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,\n    &quot;git-widget-placeholder&quot;: &quot;Version---1--sharuk&quot;,\n    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/maike/Documents/GitHub/Project_INFO1-Group_15&quot;,\n    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;\n  }\n}</component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"ce6ebca6-4f92-4740-b760-adca7e2a653d\" name=\"Changes\" comment=\"\" />\n      <created>1774092634606</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1774092634606</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278302493</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278302493</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"dd\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774278984622</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774278984622</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281642680</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281642680</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774281971115</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774281971115</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774283570735</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774283570735</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"Step 3 good\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774286268511</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774286268511</updated>\n    </task>\n    <task id=\"LOCAL-00007\" summary=\"N\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774356127494</created>\n      <option name=\"number\" value=\"00007\" />\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774356127494</updated>\n    </task>\n    <task id=\"LOCAL-00008\" summary=\"N\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774432544616</created>\n      <option name=\"number\" value=\"00008\" />\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774432544616</updated>\n    </task>\n    <task id=\"LOCAL-00009\" summary=\"N\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774433125482</created>\n      <option name=\"number\" value=\"00009\" />\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774433125482</updated>\n    </task>\n    <task id=\"LOCAL-00010\" summary=\"N\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1774436232830</created>\n      <option name=\"number\" value=\"00010\" />\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1774436232830</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"11\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"Version-1\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"dd\" />\n    <MESSAGE value=\"Step 3 good\" />\n    <MESSAGE value=\"N\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"N\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 0d65d5e933743516babebc656445432c9df342eb)
++++ b/.idea/workspace.xml	(date 1774437333333)
+@@ -4,7 +4,11 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="N" />
++    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="N">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/GoogleEarthfunction.py" beforeDir="false" afterPath="$PROJECT_DIR$/GoogleEarthfunction.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -57,6 +61,7 @@
+     &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,
+     &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,
+     &quot;Python.airport.executor&quot;: &quot;Run&quot;,
++    &quot;Python.interface.executor&quot;: &quot;Run&quot;,
+     &quot;Python.test_airport.executor&quot;: &quot;Run&quot;,
+     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+@@ -157,11 +162,11 @@
+     </task>
+     <task id="LOCAL-00010" summary="N">
+       <option name="closed" value="true" />
+-      <created>1774436232830</created>
++      <created>1774435927208</created>
+       <option name="number" value="00010" />
+       <option name="presentableId" value="LOCAL-00010" />
+       <option name="project" value="LOCAL" />
+-      <updated>1774436232830</updated>
++      <updated>1774435927208</updated>
+     </task>
+     <option name="localTasksCounter" value="11" />
+     <servers />
