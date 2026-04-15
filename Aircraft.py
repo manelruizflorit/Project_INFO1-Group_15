@@ -44,54 +44,75 @@ def LoadArrivals(filename):
     return arrivals_list
 
 
+
 def PlotArrivals(aircrafts):
-    """
-        Recibe una lista de objetos Aircraft y muestra un gráfico de la frecuencia
-        de aterrizajes durante el día (aviones por hora).
-        """
-    # Check if the list is empty
+    # We check if the list is empty and create an error message
     if not aircrafts:
-        print("Error: The list of aircreafts is empty. The graphic cannot be made.")
+        print("Error: The arrivals list is empty. The graphic cannot be generated.")
         return
 
-    # We create a list with 24 0s, one for each hour of the day
+    # We create a list with a 0 for every hour of the day
     arrivals_per_hour = [0] * 24
 
-    # Extract the time for every hour and increase the corresponding count
+    # We check every aircraft's arrival time and codes
     for aircraft in aircrafts:
         try:
-            # Se asume que el atributo de tiempo se llama 'time' y tiene formato "hh:mm"
-            if aircrafts.landing_time:
-                # Separar la cadena por los dos puntos y tomar la primera parte (la hora)
-                hour_str = aircraft.time.split(':')[0]
-                hour = int(hour_str)
+            # We take only the hours in the time for every arrival and add them up
+            hour_str = aircraft.landing_time.split(':')[0]
+            hour = int(hour_str)
 
-                # Asegurarse de que la hora sea válida (entre 0 y 23)
-                if 0 <= hour <= 23:
-                    arrivals_per_hour[hour] += 1
-        except (ValueError, AttributeError, IndexError):
-            # Si hay un error con el formato de la hora en algún registro, se salta
+            if 0 <= hour <= 23:
+                arrivals_per_hour[hour] += 1
+        except (ValueError, IndexError):
+            # We skip if a time doesn't have the right value
             continue
 
-    # Eje X: Horas del día (0 a 23)
-    hours_per_day = list(range(24))
+    # We create the labels for the axes
+    hours_labels = [f"{i:02d}:00" for i in range(24)]
 
-    # Crear el gráfico de barras
+    # We make the bar plot to show everything and set colors to the bars
     plt.figure(figsize=(10, 6))
-    plt.bar(hours_per_day, arrivals_per_hour, color='skyblue', edgecolor='black')
+    plt.bar(hours_labels, arrivals_per_hour, color='skyblue', edgecolor='black')
 
-    # Personalizar el gráfico
-    plt.title('Arrivals frequency per hour in LEBL', fontsize=14)
-    plt.xlabel('Time of the day (00:00 - 23:00)', fontsize=12)
-    plt.ylabel('Number of arrivals', fontsize=12)
-
-    # Asegurar que se muestren todas las horas en el eje X
-    plt.xticks(hours_per_day)
-
-    # Añadir una cuadrícula para facilitar la lectura
+    # We add titles and imporve design
+    plt.title('Arrivals per hour in LEBL')
+    plt.xlabel('Time of the day')
+    plt.ylabel('Number of arrivals')
+    plt.xticks(rotation=45)  # We turn the labels a bit just so we can read them better
+    plt.yticks(range(0, max(arrivals_per_hour) + 2))  # We adjust the y labels so we can see whole numbers
     plt.grid(axis='y', linestyle='--', alpha=0.7)
 
-    # Mostrar el gráfico
+    plt.tight_layout()
     plt.show()
 
-PlotArrivals(LoadArrivals("Arrivals.txt"))
+def SaveFlights(aircrafts, filename):
+    # If the list is empty → error
+    if not aircrafts:
+        print("Error: The aircraft list is empty. No file created.")
+        return -1  # error code
+
+    try:
+        with open(filename, 'w') as f:
+            # Write header (adjust if your input header is different)
+            f.write("ID ORIGIN TIME AIRLINE\n")
+
+            for aircraft in aircrafts:
+                # Replace empty fields
+                aircraft_id = aircraft.aircraft_id if aircraft.aircraft_id else "-"
+                origin = aircraft.origin_airport if aircraft.origin_airport else "-"
+                time = aircraft.landing_time if aircraft.landing_time else "00:00"
+                airline = aircraft.airline_company if aircraft.airline_company else "-"
+
+                # Write line in same format as input
+                f.write(f"{aircraft_id} {origin} {time} {airline}\n")
+
+        return 0  # success
+
+    except Exception as e:
+        print(f"Error writing file: {e}")
+        return -1
+
+a=LoadArrivals('Arrivals.txt')
+b= SaveFlights('flights.txt', a)
+a
+b
