@@ -116,3 +116,36 @@ a=LoadArrivals('Arrivals.txt')
 b= SaveFlights('flights.txt', a)
 a
 b
+
+def PlotAirlines(aircrafts):
+    # Check if empty
+    if not aircrafts:
+        print("Error: The aircraft list is empty. The graphic cannot be generated.")
+        return
+
+    # Create empty vectors
+    airlines = []
+    counts = []
+
+    # Count manually
+    for aircraft in aircrafts:
+        airline = aircraft.airline_company if aircraft.airline_company else "-"
+
+        if airline in airlines:
+            index = airlines.index(airline)
+            counts[index] += 1
+        else:
+            airlines.append(airline)
+            counts.append(1)
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.bar(airlines, counts, edgecolor='black')
+
+    plt.title('Flights per Airline')
+    plt.xlabel('Airline (ICAO Code)')
+    plt.ylabel('Number of Flights')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+    plt.show()
