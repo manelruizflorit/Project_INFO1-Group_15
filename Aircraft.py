@@ -112,10 +112,6 @@ def SaveFlights(aircrafts, filename):
         print(f"Error writing file: {e}")
         return -1
 
-a=LoadArrivals('Arrivals.txt')
-b= SaveFlights('flights.txt', a)
-a
-b
 
 def PlotAirlines(aircrafts):
     # Check if empty

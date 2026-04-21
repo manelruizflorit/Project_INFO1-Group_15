@@ -1,4 +1,6 @@
 import os
+from fileinput import filename
+
 import matplotlib.pyplot as plt
 
 # --- STEP 1: CLASS DEFINITION ---
@@ -29,11 +31,19 @@ def PrintAirport(airport):
 def ConvertToDecimal(coord_str):
     """ Converts N635906 to decimal degrees """
     direction = coord_str[0]
-    
-    # IL FAUT METTRE int() ICI POUR TRANSFORMER LE TEXTE EN NOMBRE
-    deg = int(coord_str[1:3])      # "63" -> 63
-    minutes = int(coord_str[3:5])  # "59" -> 59
-    seconds = int(coord_str[5:7])  # "06" -> 6
+    if len(coord_str) == 7:
+        # proces latitude
+        # IL FAUT METTRE int() ICI POUR TRANSFORMER LE TEXTE EN NOMBRE
+        deg = int(coord_str[1:3])  # "63" -> 63
+        minutes = int(coord_str[3:5])  # "59" -> 59
+        seconds = int(coord_str[5:7])  # "06" -> 6
+    else:
+        # proces longitude
+        # IL FAUT METTRE int() ICI POUR TRANSFORMER LE TEXTE EN NOMBRE
+        deg = int(coord_str[1:4])  # "63" -> 63
+        minutes = int(coord_str[4:6])  # "59" -> 59
+        seconds = int(coord_str[6:8])  # "06" -> 6
+
     
     # Maintenant que ce sont des nombres, le calcul fonctionne !
     decimal = deg + (minutes / 60.0) + (seconds / 3600.0)
@@ -128,6 +138,7 @@ def RemoveAirport(airports, code):
     return -1
 def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
+
     if not airports:
         return -1
     filename = "airports.kml"
@@ -169,3 +180,10 @@ def MapAirports(airports):
         return 0
     except IOError:
         return -1
+
+def ShowAirports(list):
+    resultat = MapAirports(list)
+    if resultat == 0:
+        ruta_kml = os.path.join(os.getcwd(), "airports.kml")
+        os.startfile(ruta_kml)
+
