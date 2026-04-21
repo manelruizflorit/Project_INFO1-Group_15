@@ -181,5 +181,94 @@ def PlotFlightsType(aircrafts):
     plt.tight_layout()
     plt.show()
 
-def MapFlights(aircrafts):
-    aircrafts = LoadArrivals(aircrafts)
+def Coordenates(Airport_code):
+    if not Airport_code:
+        print("Error, there's no airport ICAO code")
+        return
+    coordenadas = [0,0]
+    try:
+        with open("Airports.txt", 'r') as f:
+            lines = f.readlines()
+
+            if len(lines) <= 1:
+                return []
+
+            for i in range(1, len(lines)):
+                line = lines[i].strip()
+                if not line:
+                    continue
+
+                parts = line.split()
+                if len(parts) == 3:
+                    code = parts[0]
+                    if code == str(Airport_code):
+                        if parts[1][0] in ['N', 'S', 'E', 'W']:
+                            lat_dec = ConvertToDecimal(parts[1])
+                            lon_dec = ConvertToDecimal(parts[2])
+                        else:
+                            lat_dec = float(parts[1])
+                            lon_dec = float(parts[2])
+        coordenadas[0] = lat_dec
+        coordenadas[1] = lon_dec
+    except ValueError:
+        return []
+    return coordenadas
+
+def MapFlights(flights):
+    flights = LoadArrivals(flights)
+    if not flights:
+        return -1
+    filename = "flights.kml"
+    try:
+        f = open(filename, "w")
+
+        f.write("<?xml version='1.0' encoding='UTF-8'?>\n")
+        f.write('<kml xmlns="http://www.opengis.net/kml/2.2">\n')
+        f.write("<Document>\n")
+
+        i = 0
+        while i < len(flights):
+            flight = flights[i]
+            origin = flight.origin_airport
+            if IsSchengenAirport(origin):
+                color = "ff00ffff"
+            else:
+                color = "ffff0000"
+
+            lat_final = 41.2969
+            lon_final = 2.0784
+
+            cordenadas = Coordenates(origin)
+
+            lon_inicial = cordenadas[1]
+            lat_inicial = cordenadas[0]
+
+
+            f.write("   <Placemark>\n")
+            f.write("   <name>" + str(flight.aircraft_id) + "</name>\n")
+            f.write("   <Style><LineStyle><color>" + color + "</color><width>2</width></LineStyle></Style>\n")
+            f.write("   <LineString>\n")
+            f.write("   <coordinates>\n")
+
+            f.write("   " + str(lon_inicial) + "," + str(lat_inicial) + ",0 ")
+            f.write(str(lon_final) + "," + str(lat_final) + ",0\n")
+            f.write("   </coordinates>\n")
+            f.write("   </LineString>\n")
+            f.write("   </Placemark>\n")
+
+            i += 1
+        f.write("</Document>\n")
+        f.write("</kml>\n")
+        f.close()
+
+        return 0
+    except IOError:
+        return -1
+
+def ShowFlights(list):
+    show = MapFlights(list)
+    if show == 0:
+        route_kml = os.path.join(os.getcwd(), "flights.kml")
+        os.startfile(route_kml)
+
+
