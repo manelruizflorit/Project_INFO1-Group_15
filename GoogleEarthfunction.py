@@ -51,5 +51,6 @@ else:
     print("Error al crear el archivo")
 import os
 print(os.getcwd())
+os.startfile(os.getcwd())
 
 
