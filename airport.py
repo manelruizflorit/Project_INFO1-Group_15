@@ -138,7 +138,7 @@ def RemoveAirport(airports, code):
     return -1
 def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
-
+    airports = LoadAirports(airports)
     if not airports:
         return -1
     filename = "airports.kml"
@@ -148,7 +148,7 @@ def MapAirports(airports):
             file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             file.write('<kml xmlns="http://www.opengis.net/kml/2.2">\n')
             file.write('<Document>\n')
-    # We differentiate from Shengen to non shengen airports with red and blue colors
+    # We differentiate from Shengen to non shengen airports with colors
             i = 0
             while i < len(airports):
                 SetSchengen(airports[i])

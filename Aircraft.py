@@ -1,5 +1,4 @@
-import os
-import matplotlib.pyplot as plt
+from airport import *
 
 #We define a new class, aircaft:
 
@@ -30,22 +29,19 @@ def LoadArrivals(filename):
 
             parts = line.split()
             if len(parts) == 4:
-                if len(parts[0]) != 5 or len(parts[1]) != 4 or len(parts[3]) != 3: #we need sharuk to improve our filter on time and numbers
+                if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3: #we need sharuk to improve our filter on time and numbers
                     linea = True
-
                 elif linea == False:
                     aircraft_id = str(parts[0]).upper()
                     new_aircraft = Aircraft(aircraft_id, parts[1], parts[2], parts[3])
                     arrivals_list.append(new_aircraft)
-
                 else:
                     linea = False
 
     return arrivals_list
 
-
-
 def PlotArrivals(aircrafts):
+    aircrafts = LoadArrivals(aircrafts)
     # We check if the list is empty and create an error message
     if not aircrafts:
         print("Error: The arrivals list is empty. The graphic cannot be generated.")
@@ -86,6 +82,7 @@ def PlotArrivals(aircrafts):
     plt.show()
 
 def SaveFlights(aircrafts, filename):
+    aircrafts = LoadArrivals(aircrafts)
     # If the list is empty → error
     if not aircrafts:
         print("Error: The aircraft list is empty. No file created.")
@@ -114,6 +111,7 @@ def SaveFlights(aircrafts, filename):
 
 
 def PlotAirlines(aircrafts):
+    aircrafts = LoadArrivals(aircrafts)
     # Check if empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
@@ -125,7 +123,7 @@ def PlotAirlines(aircrafts):
 
     # Count manually
     for aircraft in aircrafts:
-        airline = aircraft.airline_company if aircraft.airline_company else "-"
+        airline = aircraft.airline_company if aircraft.airline_company.exists else "-"
 
         if airline in airlines:
             index = airlines.index(airline)
@@ -145,3 +143,43 @@ def PlotAirlines(aircrafts):
 
     plt.tight_layout()
     plt.show()
+
+def PlotFlightsType(aircrafts):
+    aircrafts = LoadArrivals(aircrafts)
+    # Check if empty
+    if not aircrafts:
+        print("Error: The aircraft list is empty. The graphic cannot be generated.")
+        return
+
+    # Create counters
+    schengen_count = 0
+    non_schengen_count = 0
+
+    # Count manually
+    for aircraft in aircrafts:
+
+        if IsSchengenAirport(aircraft.origin_airport) == True:
+            schengen_count += 1
+        else:
+            non_schengen_count += 1
+
+    #Data for plot
+    labels = ["Flights"]
+    schengen_values = [schengen_count]
+    non_schengen_values = [non_schengen_count]
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels, schengen_values, label = "Schengen", edgecolor='black')
+    plt.bar(labels, non_schengen_values, bottom = schengen_values, label="Non-Schengen", edgecolor='black')
+
+    plt.title('Flights by origin airport (Schengen vs Non-Schengen)')
+    plt.ylabel('Number of flights')
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+    plt.show()
+
+def MapFlights(aircrafts):
+    aircrafts = LoadArrivals(aircrafts)
