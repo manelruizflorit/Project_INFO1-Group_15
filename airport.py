@@ -116,7 +116,7 @@ def PlotAirports(airports):
 
     # Plotting
     plt.bar("Airports", nb_s, color='blue', label='Schengen')
-    plt.bar("Airports", nb_ns, bottom=nb_s, color='red', label='No Schengen')
+    plt.bar("Airports", nb_ns, bottom=nb_s, color='red', label='Non Schengen')
     plt.title("Schengen Airport")
     plt.ylabel("Count")
     plt.legend()
@@ -138,7 +138,6 @@ def RemoveAirport(airports, code):
     return -1
 def MapAirports(airports):
     # This function allows us to see in google earth the airports that we want, distinguished as shengen and non shengen by colors
-    airports = LoadAirports(airports)
     if not airports:
         return -1
     filename = "airports.kml"

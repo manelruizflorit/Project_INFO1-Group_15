@@ -45,7 +45,6 @@ def LoadArrivals(filename):
     return arrivals_list
 
 def PlotArrivals(aircrafts):
-    aircrafts = LoadArrivals(aircrafts)
     # We check if the list is empty and create an error message
     if not aircrafts:
         print("Error: The arrivals list is empty. The graphic cannot be generated.")
@@ -86,7 +85,6 @@ def PlotArrivals(aircrafts):
     plt.show()
 
 def SaveFlights(aircrafts, filename):
-    aircrafts = LoadArrivals(aircrafts)
     # If the list is empty → error
     if not aircrafts:
         print("Error: The aircraft list is empty. No file created.")
@@ -95,17 +93,17 @@ def SaveFlights(aircrafts, filename):
     try:
         with open(filename, 'w') as f:
             # Write header (adjust if your input header is different)
-            f.write("ID ORIGIN TIME AIRLINE\n")
+            f.write("AIRCRAFT ORIGIN TIME AIRLINE\n")
 
             for aircraft in aircrafts:
                 # Replace empty fields
-                aircraft_id = aircraft.aircraft_id if aircraft.aircraft_id else "-"
+                a_id = aircraft.aircraft_id if aircraft.aircraft_id else "-"
                 origin = aircraft.origin_airport if aircraft.origin_airport else "-"
                 time = aircraft.landing_time if aircraft.landing_time else "00:00"
                 airline = aircraft.airline_company if aircraft.airline_company else "-"
 
                 # Write line in same format as input
-                f.write(f"{aircraft_id} {origin} {time} {airline}\n")
+                f.write(f"{a_id} {origin} {time} {airline}\n")
 
         return 0  # success
 
@@ -115,7 +113,6 @@ def SaveFlights(aircrafts, filename):
 
 
 def PlotAirlines(aircrafts):
-    aircrafts = LoadArrivals(aircrafts)
     # Check if empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
@@ -127,8 +124,7 @@ def PlotAirlines(aircrafts):
 
     # Count manually
     for aircraft in aircrafts:
-        airline = aircraft.airline_company if aircraft.airline_company.exists else "-"
-
+        airline = aircraft.airline_company
         if airline in airlines:
             index = airlines.index(airline)
             counts[index] += 1
@@ -149,7 +145,6 @@ def PlotAirlines(aircrafts):
     plt.show()
 
 def PlotFlightsType(aircrafts):
-    aircrafts = LoadArrivals(aircrafts)
     # Check if empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
@@ -191,7 +186,7 @@ def Coordenates(Airport_code):
         return
     coordenadas = [0,0]
     try:
-        with open("Files/Airports.txt", 'r') as f:
+        with open("Airports.txt", 'r') as f:
             lines = f.readlines()
 
             if len(lines) <= 1:
@@ -269,8 +264,7 @@ def MapFlights(flights):
         return -1
 
 def ShowFlights(list):
-    aircraftlist = LoadArrivals(list)
-    show = MapFlights(aircraftlist)
+    show = MapFlights(list)
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
@@ -286,16 +280,15 @@ def Haversine(Origin_airport_code):
     d = earth_radius * c
     return d
 
-def LongDistanceArrivals(aircrafts):
-    flights = LoadArrivals(aircrafts)
+def LongDistanceArrivals(arrivals):
     long_distance =[]
-    if not aircrafts:
+    if not arrivals:
         return []
     i = 0
-    while i < len(flights):
-        origen = flights[i].origin_airport
+    while i < len(arrivals):
+        origen = arrivals[i].origin_airport
         if Haversine(origen) > 2000:
-            long_distance.append(flights[i])
+            long_distance.append(arrivals[i])
         i += 1
     return long_distance
 
