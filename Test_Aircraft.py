@@ -1,3 +1,3 @@
 from Aircraft import *
-ShowFlights("Arrivals.txt")
-ShowAirports("Airports.txt")
+k = Haversine("KJFK")
+print(k)

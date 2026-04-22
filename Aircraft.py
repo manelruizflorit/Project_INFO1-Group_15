@@ -1,3 +1,7 @@
+import math
+from idlelib.debugger_r import close_remote_debugger
+from math import radians, cos
+
 from airport import *
 
 #We define a new class, aircaft:
@@ -271,4 +275,28 @@ def ShowFlights(list):
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
 
+def Haversine(Origin_airport_code):
+    cords = Coordenates(Origin_airport_code)
+    leblcords = Coordenates("LEBL")
+    earth_radius = 6371
+    d_lat = abs(cords[0]-leblcords[0])
+    d_lon = abs(cords[1]-leblcords[1])
+    a = math.sin(math.radians(d_lat) / 2)**2 + math.cos(math.radians(cords[0]))*math.cos(math.radians(leblcords[0]))*math.sin(math.radians(d_lon) / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    d = earth_radius * c
+    return d
+
+def LongDistanceArrivals(aircrafts):
+    flights = LoadArrivals(aircrafts)
+    long_distance_aircrafts =[]
+    if not aircrafts:
+        return []
+    i = 0
+    while i < len(flights):
+        origen = flights[i].origin_airport
+        avion = flights[i].aircraft_id
+        if Haversine(origen) > 2000:
+            long_distance_aircrafts.append(avion)
+    i += 1
+    return long_distance_aircrafts
 
