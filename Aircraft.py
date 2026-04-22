@@ -191,7 +191,7 @@ def Coordenates(Airport_code):
         return
     coordenadas = [0,0]
     try:
-        with open("Airports.txt", 'r') as f:
+        with open("Files/Airports.txt", 'r') as f:
             lines = f.readlines()
 
             if len(lines) <= 1:

@@ -8,7 +8,7 @@ SetSchengen(a)
 PrintAirport(a)
 
 # 1. On charge la liste initiale UNE SEULE FOIS
-my_list = LoadAirports("Airports.txt")
+my_list = LoadAirports("Files/Airports.txt")
 
 # 2. On ajoute les aéroports à la liste en mémoire
 AddAirport(my_list, a)
@@ -34,5 +34,5 @@ print(f"Loaded {len(my_list)} airports with decimals.")
 PlotAirports(my_list)
 
 # 3. On sauvegarde le résultat final dans le fichier texte
-SaveSchengenAirports(my_list, "Airports.txt")
+SaveSchengenAirports(my_list, "Files/Airports.txt")
 print("Schengen list saved to Airports.txt")

@@ -17,7 +17,7 @@ def refresh_list():
 def load_file():
     """Loads the text file"""
     global my_airports
-    my_airports = LoadAirports("Airports.txt")
+    my_airports = LoadAirports("Files/Airports.txt")
     for a in my_airports:
         SetSchengen(a) # Updates the Schengen status
     refresh_list()
@@ -52,7 +52,7 @@ def remove_airport():
 
 def save_file():
     """Saves only Schengen airports to the file"""
-    SaveSchengenAirports(my_airports, "Airports.txt")
+    SaveSchengenAirports(my_airports, "Files/Airports.txt")
     messagebox.showinfo("Success", "Schengen airports saved!")
 
 def show_plot():
