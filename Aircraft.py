@@ -219,7 +219,6 @@ def Coordenates(Airport_code):
     return coordenadas
 
 def MapFlights(flights):
-    flights = LoadArrivals(flights)
     if not flights:
         return -1
     filename = "flights.kml"
@@ -270,7 +269,8 @@ def MapFlights(flights):
         return -1
 
 def ShowFlights(list):
-    show = MapFlights(list)
+    aircraftlist = LoadArrivals(list)
+    show = MapFlights(aircraftlist)
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
@@ -288,15 +288,20 @@ def Haversine(Origin_airport_code):
 
 def LongDistanceArrivals(aircrafts):
     flights = LoadArrivals(aircrafts)
-    long_distance_aircrafts =[]
+    long_distance =[]
     if not aircrafts:
         return []
     i = 0
     while i < len(flights):
         origen = flights[i].origin_airport
-        avion = flights[i].aircraft_id
         if Haversine(origen) > 2000:
-            long_distance_aircrafts.append(avion)
-    i += 1
-    return long_distance_aircrafts
+            long_distance.append(flights[i])
+        i += 1
+    return long_distance
 
+def ShowLongDistanceFlights(aircrafts):
+    flights = LongDistanceArrivals(aircrafts)
+    show = MapFlights(flights)
+    if show == 0:
+        route_kml = os.path.join(os.getcwd(), "flights.kml")
+        os.startfile(route_kml)

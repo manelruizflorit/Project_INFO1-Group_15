@@ -1,3 +1,2 @@
 from Aircraft import *
-k = Haversine("KJFK")
-print(k)
+ShowLongDistanceFlights("Arrivals.txt")
