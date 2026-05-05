@@ -4,6 +4,10 @@
 # CLASSES
 # ==========================================
 
+from Aircraft import *
+
+#We define the new classes
+
 class Gate:
     def __init__(self, name):
         self.name = name
@@ -30,15 +34,14 @@ class BarcelonaAP:
         self.code = code
         self.terminals = []
 
-
 # ==========================================
 # FUNCTIONS
 # ==========================================
 
 def SetGates(area, init_gate, end_gate, prefix):
-    """
-    Updates the list of gates of the boarding area.
-    """
+
+#Updates the list of gates of the boarding area.
+
     # Return error code -1 if end gate is not greater than init gate
     if end_gate <= init_gate:
         return -1
