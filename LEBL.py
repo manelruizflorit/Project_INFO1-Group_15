@@ -1,13 +1,8 @@
-class BarcelonaAP:
-    def __init__(self, code):
-        self.code = code
-        self.terminals = []
-
-class Terminal:
+class Gate:
     def __init__(self, name):
         self.name = name
-        self.boarding_areas = []
-        self.airlines = [] # List of ICAO codes
+        self.occupied = False
+        self.aircraft_id = ""
 
 class BoardingArea:
     def __init__(self, name, area_type):
@@ -15,8 +10,13 @@ class BoardingArea:
         self.type = area_type # 'Schengen' or 'non-Schengen'
         self.gates = []
 
-class Gate:
+class Terminal:
     def __init__(self, name):
         self.name = name
-        self.occupied = False
-        self.aircraft_id = ""
+        self.boarding_areas = []
+        self.airlines = [] # List of ICAO codes
+
+class BarcelonaAP:
+    def __init__(self, code):
+        self.code = code
+        self.terminals = []
