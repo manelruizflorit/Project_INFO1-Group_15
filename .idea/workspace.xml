@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Final version 2">
-      <change afterPath="$PROJECT_DIR$/Test_LEBL.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LEBL.py" beforeDir="false" afterPath="$PROJECT_DIR$/LEBL.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
