@@ -1,5 +1,10 @@
 # LEBL.py
 
+import os
+from airport import IsSchengenAirport
+from aircraft import Aircraft, LoadArrivals
+
+
 # ==========================================
 # CLASSES
 # ==========================================
@@ -44,7 +49,7 @@ def SetGates(area, init_gate, end_gate, prefix):
     area.gates = []
 
     for i in range(init_gate, end_gate + 1):
-        # Create the name using basic string addition instead of f-strings
+        # Create the name using basic string addition
         gate_name = prefix + str(i)
         new_gate = Gate(gate_name)
         area.gates.append(new_gate)
@@ -164,22 +169,21 @@ def SearchTerminal(bcn, name):
 
 
 def AssignGate(bcn, aircraft):
-    # Check the airline-terminal assignment using SearchTerminal[cite: 1]
+    # 1. Check the airline-terminal assignment using SearchTerminal[cite: 1]
     req_terminal = SearchTerminal(bcn, aircraft.airline_company)
 
     if req_terminal == "":
         return -1
 
-        # NOTE: In your final code, you must import and use IsSchengenAirport from version 1 here[cite: 1]
-    # For now, we use a simple True/False placeholder so it runs.
-    is_schengen = True
+    # 2. Check if the origin airport is Schengen using YOUR airport.py function
+    is_schengen = IsSchengenAirport(aircraft.origin_airport)
 
     if is_schengen == True:
         req_type = "Schengen"
     else:
         req_type = "non-Schengen"
 
-    # Looks for the first gate that is not occupied in the correct boarding area[cite: 1]
+    # 3. Looks for the first gate that is not occupied in the correct boarding area[cite: 1]
     for terminal in bcn.terminals:
         if terminal.name == req_terminal:
             for area in terminal.boarding_areas:
@@ -188,10 +192,11 @@ def AssignGate(bcn, aircraft):
                         if gate.occupied == False:
                             # Update the occupancy boolean and the aircraft field[cite: 1]
                             gate.occupied = True
-                            gate.aircraft_id = aircraft.id
+                            # IMPORTANT: Using aircraft.aircraft_id to match your aircraft.py class!
+                            gate.aircraft_id = aircraft.aircraft_id
                             return 0
 
-                            # If there is no more free gates, an error code shall be returned[cite: 1]
+    # If there is no more free gates, an error code shall be returned[cite: 1]
     return -1
 
 
@@ -199,47 +204,57 @@ def AssignGate(bcn, aircraft):
 # TEST SECTION
 # ==========================================
 if __name__ == "__main__":
-    print("--- STARTING TESTS ---")
+    print("--- STARTING VERSION 3 INTEGRATION TESTS ---")
 
+    # 1. Load the Airport
     bcn_airport = LoadAirportStructure("LEBL.txt")
 
     if bcn_airport == -1:
-        print("ERROR: Could not load LEBL.txt.")
+        print(
+            "ERROR: Could not load LEBL.txt. Make sure LEBL.txt, T1_Airlines.txt, and T2_Airlines.txt are in the folder.")
     else:
         print("SUCCESS: Loaded Airport " + bcn_airport.code)
 
-        test_airline = "AEE"
-        term_found = SearchTerminal(bcn_airport, test_airline)
+        # 2. Load the real aircraft from your Arrivals text file!
+        # Make sure "Arrivals.txt" is in your folder.
+        real_flights = LoadArrivals("Arrivals.txt")
 
-        if term_found != "":
-            print("SUCCESS: Found airline " + test_airline + " in Terminal " + term_found)
+        if not real_flights:
+            print("WARNING: Could not load Arrivals.txt. Place the file in the folder to test gate assignment.")
         else:
-            print("WARNING: Could not find " + test_airline)
+            print("SUCCESS: Loaded " + str(len(real_flights)) + " aircraft from Arrivals.txt")
 
+            # 3. Try to assign gates to the first 10 planes that landed
+            success_count = 0
+            fail_count = 0
 
-        # Mock aircraft to test the assignment
-        class MockAircraft:
-            def __init__(self, flight_id, company, origin):
-                self.id = flight_id
-                self.airline_company = company
-                self.origin_airport = origin
+            # We only test the first 10 so we don't spam the console
+            planes_to_test = real_flights[:10]
 
+            for plane in planes_to_test:
+                result = AssignGate(bcn_airport, plane)
+                if result == 0:
+                    success_count += 1
+                else:
+                    fail_count += 1
 
-        test_flight = MockAircraft("AEE123", "AEE", "LGAV")
+            print("\nAssignment Results for first 10 planes:")
+            print("- Successfully parked: " + str(success_count))
+            print("- Failed to park: " + str(fail_count) + " (Usually means airline not found in T1/T2 txt files)")
 
-        assignment_result = AssignGate(bcn_airport, test_flight)
+            # 4. Check the occupancy list
+            all_gates = GateOccupancy(bcn_airport)
+            occupied_gates = []
 
-        if assignment_result == 0:
-            print("SUCCESS: Airplane " + test_flight.id + " was assigned a gate.")
-        else:
-            print("ERROR: Failed to assign gate.")
+            for g in all_gates:
+                if g[1] == True:  # g[1] is the occupied status
+                    occupied_gates.append(g)
 
-        all_gates = GateOccupancy(bcn_airport)
-        occupied_gates = []
-        for g in all_gates:
-            if g[1] == True:
-                occupied_gates.append(g)
+            print("\nOccupied Gates List:")
+            if len(occupied_gates) > 0:
+                for g in occupied_gates:
+                    print("-> Gate " + g[0] + " is occupied by flight " + g[2])
+            else:
+                print("-> No gates are currently occupied.")
 
-        if len(occupied_gates) > 0:
-            for g in occupied_gates:
-                print("-> Gate " + g[0] + " occupied by " + g[2])
+    print("\n--- TESTS FINISHED ---")
