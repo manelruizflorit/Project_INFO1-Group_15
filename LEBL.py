@@ -1,5 +1,3 @@
-# LEBL.py
-
 import os
 from airport import IsSchengenAirport
 from Aircraft import Aircraft, LoadArrivals
@@ -16,9 +14,9 @@ class Gate:
 
 
 class BoardingArea:
-    def __init__(self, name, type):
+    def __init__(self, name, area_type):
         self.name = name
-        self.type = type
+        self.type = area_type   # "Schengen" or "non-Schengen"
         self.gates = []
 
 
@@ -26,7 +24,7 @@ class Terminal:
     def __init__(self, name):
         self.name = name
         self.boarding_areas = []
-        self.airlines = []
+        self.airlines = []      # List of ICAO airline codes (3-char)
 
 
 class BarcelonaAP:
@@ -40,155 +38,155 @@ class BarcelonaAP:
 # ==========================================
 
 def SetGates(area, init_gate, end_gate, prefix):
-    # If the end gate number is not greater than the init gate number, return -1[cite: 1]
+    # If end_gate is not greater than init_gate, return error
     if end_gate <= init_gate:
         return -1
 
-    # If the area had a previous list of gates, drop it[cite: 1]
+    # Drop previous list of gates
     area.gates = []
 
-    for i in range(init_gate, end_gate +1):
-        # Create the name using basic string addition
+    for i in range(init_gate, end_gate + 1):
         gate_name = prefix + str(i)
-        new_gate = Gate(gate_name)
-        area.gates.append(new_gate)
+        area.gates.append(Gate(gate_name))
 
     return 0
 
 
 def LoadAirlines(terminal, t_name):
-    # Build the file name as required[cite: 1]
+    # Build the file name
     filename = t_name + "_Airlines.txt"
 
     try:
-        with open(filename, 'r') as file:
-            # Drop previous list of airlines if it existed[cite: 1]
+        with open(filename, 'r') as f:
             terminal.airlines = []
-
-            for line in file:
-                parts = line.strip().split('\t')
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split('\t')
                 if len(parts) >= 2:
                     terminal.airlines.append(parts[1].strip())
         return 0
+
     except FileNotFoundError:
-        # If the file does not exist, an error code shall be returned[cite: 1]
         return -1
 
 
 def LoadAirportStructure(filename):
     try:
-        with open(filename, 'r') as file:
-            lines = file.readlines()
-
-        if len(lines) == 0:
-            return -1
-
-        first_line = lines[0].split()
-        bcn = BarcelonaAP(first_line[0])
-
-        current_terminal = None
-
-        for i in range(1, len(lines)):
-            line = lines[i].strip()
-
-            if line.startswith("Terminal"):
-                parts = line.split()
-                t_name = parts[1]
-                current_terminal = Terminal(t_name)
-                bcn.terminals.append(current_terminal)
-
-                # Call LoadAirlines immediately[cite: 1]
-                LoadAirlines(current_terminal, t_name)
-
-            elif line.startswith("Area"):
-                parts = line.split()
-                area_name = parts[1]
-                type = parts[2]
-
-                gate_parts = line.split('Gates')
-                numbers_part = gate_parts[1].strip()
-
-                start_and_end = numbers_part.split('-')
-                init_gate = int(start_and_end[0].strip())
-                end_gate = int(start_and_end[1].strip())
-
-                new_area = BoardingArea(area_name, type)
-                if current_terminal != None:
-                    current_terminal.boarding_areas.append(new_area)
-
-                # Use different prefixes for each boarding area to easily locate a gate[cite: 1]
-                prefix = current_terminal.name + area_name + "G"
-                SetGates(new_area, init_gate, end_gate, prefix)
-
-        return bcn
-
+        with open(filename, 'r') as f:
+            lines = [l.rstrip('\n') for l in f.readlines()]
     except FileNotFoundError:
         return -1
 
+    if not lines:
+        return -1
+
+    # First line: "LEBL 2 terminals"
+    bcn = BarcelonaAP(lines[0].split()[0])
+
+    current_terminal = None
+
+    for line in lines[1:]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        if stripped.startswith("Terminal"):
+            # "Terminal T1 5 boarding areas"
+            t_name = stripped.split()[1]
+            current_terminal = Terminal(t_name)
+            bcn.terminals.append(current_terminal)
+            LoadAirlines(current_terminal, t_name)
+
+        elif stripped.startswith("Area"):
+            # "Area A Schengen Gates 1 - 11"
+            # "Area D non-Schengen Gates 1 - 11"
+            if current_terminal is None:
+                continue
+
+            area_name = stripped.split()[1]
+
+            # The type is everything between the area name and "Gates"
+            gates_idx = stripped.index("Gates")
+            area_type = stripped[stripped.index(area_name) + len(area_name):gates_idx].strip()
+
+            # Gate numbers are after "Gates": "1 - 11"
+            after_gates = stripped[gates_idx + len("Gates"):].strip()
+            range_parts = after_gates.split('-')
+            init_gate = int(range_parts[0].strip())
+            end_gate = int(range_parts[1].strip())
+
+            new_area = BoardingArea(area_name, area_type)
+            current_terminal.boarding_areas.append(new_area)
+
+            # Unique prefix so gate names encode terminal + area
+            prefix = current_terminal.name + area_name + "G"
+            SetGates(new_area, init_gate, end_gate, prefix)
+
+    return bcn
+
 
 def GateOccupancy(bcn):
-    # Returns a list of gates with their names, their status and the id of the aircraft[cite: 1]
+    # Returns a list of [gate_name, occupied, aircraft_id] for every gate
     occupancy_list = []
-
     for terminal in bcn.terminals:
         for area in terminal.boarding_areas:
             for gate in area.gates:
-                gate_info = [gate.name, gate.occupied, gate.aircraft_id]
-                occupancy_list.append(gate_info)
-
+                occupancy_list.append([gate.name, gate.occupied, gate.aircraft_id])
     return occupancy_list
 
 
 def IsAirlineInTerminal(terminal, name):
-    # If the name of the airline is a null string then False and an error code must be returned[cite: 1]
+    # Return False if name is empty
     if name == "":
-        return False, -1
+        return False
 
     if name in terminal.airlines:
         return True
-    else:
-        return False
+
+    return False
 
 
 def SearchTerminal(bcn, name):
+    # Return empty string if name is invalid
+    if name == "":
+        return ""
+
     for terminal in bcn.terminals:
-        result = IsAirlineInTerminal(terminal, name)
-        if result == True:
+        if IsAirlineInTerminal(terminal, name):
             return terminal.name
 
-    return ""
-    # If the airline is not found, the return name shall be a null string[cite: 1]
+    # Airline not found in any terminal
     return ""
 
 
 def AssignGate(bcn, aircraft):
-    # 1. Check the airline-terminal assignment using SearchTerminal[cite: 1]
+    # 1. Find the terminal for this airline
     req_terminal = SearchTerminal(bcn, aircraft.airline_company)
-
     if req_terminal == "":
         return -1
 
-    # 2. Check if the origin airport is Schengen using YOUR airport.py function
-    is_schengen = IsSchengenAirport(aircraft.origin_airport)
-
-    if is_schengen == True:
+    # 2. Determine Schengen type of the origin airport
+    if IsSchengenAirport(aircraft.origin_airport):
         req_type = "Schengen"
     else:
         req_type = "non-Schengen"
 
-    # 3. Looks for the first gate that is not occupied in the correct boarding area[cite: 1]
+    # 3. Find first free gate in the correct terminal + area type
     for terminal in bcn.terminals:
-        if terminal.name == req_terminal:
-            for area in terminal.boarding_areas:
-                if area.type == req_type:
-                    for gate in area.gates:
-                        if gate.occupied == False:
-                            # Update the occupancy boolean and the aircraft field[cite: 1]
-                            gate.occupied = True
-                            # IMPORTANT: Using aircraft.aircraft_id to match your aircraft.py class!
-                            gate.aircraft_id = aircraft.aircraft_id
-                            return 0
+        if terminal.name != req_terminal:
+            continue
+        for area in terminal.boarding_areas:
+            if area.type != req_type:
+                continue
+            for gate in area.gates:
+                if not gate.occupied:
+                    gate.occupied = True
+                    gate.aircraft_id = aircraft.aircraft_id
+                    return 0
 
-    # If there is no more free gates, an error code shall be returned[cite: 1]
+    # No free gate found
     return -1
+
 

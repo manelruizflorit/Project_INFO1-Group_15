@@ -1,69 +1,84 @@
 from LEBL import *
-# ==========================================
-# 3. TEST SECTION
-# This code only runs if you play this file directly.
-# It proves that all our commands above actually work.[cite: 1]
-# ==========================================
-
 if __name__ == "__main__":
-    print("--- STARTING TESTS ---")
 
-    print("\n1. Testing LoadAirportStructure...")
-    bcn_airport = LoadAirportStructure("LEBL.txt")
+    print("=" * 50)
+    print("TEST: LoadAirportStructure")
+    print("=" * 50)
 
-    if bcn_airport == -1:
-        print("ERROR: Could not load LEBL.txt. Make sure the file is in the exact same folder as this Python file.")
+    bcn = LoadAirportStructure("LEBL.txt")
+
+    if bcn == -1:
+        print("ERROR: Could not load LEBL.txt")
     else:
-        print("SUCCESS: Loaded Airport " + bcn_airport.code)
+        print(f"Airport code: {bcn.code}")
+        print(f"Number of terminals: {len(bcn.terminals)}")
+        for t in bcn.terminals:
+            print(f"\n  Terminal: {t.name}")
+            print(f"  Airlines loaded: {len(t.airlines)}")
+            if t.airlines:
+                print(f"  First 5 airlines: {t.airlines[:5]}")
+            for area in t.boarding_areas:
+                print(f"    Area {area.name} [{area.type}]: {len(area.gates)} gates "
+                      f"({area.gates[0].name} ... {area.gates[-1].name})")
 
-        for term in bcn_airport.terminals:
-            print("  -> Terminal " + term.name + " has " + str(len(term.boarding_areas)) + " areas and " + str(
-                len(term.airlines)) + " airlines logged.")
+    print("\n" + "=" * 50)
+    print("TEST: SetGates (error case: end <= init)")
+    print("=" * 50)
+    dummy_area = BoardingArea("X", "Schengen")
+    result = SetGates(dummy_area, 10, 5, "TEST")
+    print(f"SetGates(10, 5) returned: {result}  (expected -1)")
 
-        print("\n2. Testing Airline Searches...")
-        test_airline = "AEE"
-        term_found = SearchTerminal(bcn_airport, test_airline)
+    print("\n" + "=" * 50)
+    print("TEST: IsAirlineInTerminal")
+    print("=" * 50)
+    if bcn != -1 and bcn.terminals:
+        t = bcn.terminals[0]
+        if t.airlines:
+            test_code = t.airlines[0]
+            print(f"'{test_code}' in {t.name}: {IsAirlineInTerminal(t, test_code)}  (expected True)")
+        print(f"'XXX' in {t.name}: {IsAirlineInTerminal(t, 'XXX')}  (expected False)")
+        print(f"'' in {t.name}: {IsAirlineInTerminal(t, '')}  (expected False)")
 
-        if term_found != "":
-            print("SUCCESS: Found airline " + test_airline + " in Terminal " + term_found)
+    print("\n" + "=" * 50)
+    print("TEST: SearchTerminal")
+    print("=" * 50)
+    if bcn != -1:
+        if bcn.terminals and bcn.terminals[0].airlines:
+            code = bcn.terminals[0].airlines[0]
+            print(f"SearchTerminal('{code}'): '{SearchTerminal(bcn, code)}'  (expected {bcn.terminals[0].name})")
+        print(f"SearchTerminal('ZZZ'): '{SearchTerminal(bcn, 'ZZZ')}'  (expected '')")
+
+    print("\n" + "=" * 50)
+    print("TEST: GateOccupancy (initial state)")
+    print("=" * 50)
+    if bcn != -1:
+        occ = GateOccupancy(bcn)
+        total = len(occ)
+        occupied = sum(1 for g in occ if g[1])
+        print(f"Total gates: {total}, Occupied: {occupied}, Free: {total - occupied}")
+
+    print("\n" + "=" * 50)
+    print("TEST: AssignGate")
+    print("=" * 50)
+    if bcn != -1:
+        arrivals = LoadArrivals("arrivals.txt")
+        if not arrivals:
+            print("No arrivals loaded (check arrivals.txt). Skipping AssignGate test.")
         else:
-            print("WARNING: Could not find " + test_airline)
+            assigned = 0
+            failed = 0
+            for ac in arrivals[:20]:
+                res = AssignGate(bcn, ac)
+                if res == 0:
+                    assigned += 1
+                else:
+                    failed += 1
+            print(f"Tried to assign 20 aircraft: {assigned} OK, {failed} failed")
 
-        print("\n3. Testing AssignGate...")
-
-
-        # We build a fake 'dummy' airplane just to test the parking code
-        class MockAircraft:
-            def __init__(self, flight_id, company, origin):
-                self.aircraft_id = flight_id  # FIXED: Changed from self.id to self.aircraft_id
-                self.airline_company = company
-                self.origin_airport = origin
-
-
-        test_flight = MockAircraft("AEE123", "AEE", "LGAV")
-
-        assignment_result = AssignGate(bcn_airport, test_flight)
-
-        if assignment_result == 0:
-            print("SUCCESS: Airplane " + test_flight.id + " found an empty gate and parked.")
-        else:
-            print("ERROR: Failed to assign gate. No empty gates, or terminal not found.")
-
-        print("\n4. Testing GateOccupancy...")
-        all_gates = GateOccupancy(bcn_airport)
-
-        print("Total gates generated in the whole airport: " + str(len(all_gates)))
-
-        # Let's search the list to prove the plane actually parked
-        occupied_gates = []
-        for g in all_gates:
-            if g[1] == True:  # g[1] is the 'occupied' true/false status
-                occupied_gates.append(g)
-
-        if len(occupied_gates) > 0:
-            print("Occupied Gates Found:")
-            for g in occupied_gates:
-                print("  -> Gate " + g[0] + " is currently occupied by airplane " + g[2])
-        else:
-            print("No gates are currently occupied.")
-    print("\n--- TESTS FINISHED ---")
+            occ = GateOccupancy(bcn)
+            occupied = sum(1 for g in occ if g[1])
+            print(f"Gates now occupied: {occupied}")
+            print("Sample occupied gates:")
+            for g in occ:
+                if g[1]:
+                    print(f"  {g[0]} -> {g[2]}")
