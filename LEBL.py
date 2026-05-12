@@ -4,7 +4,6 @@ import os
 from airport import IsSchengenAirport
 from Aircraft import Aircraft, LoadArrivals
 
-
 # ==========================================
 # CLASSES
 # ==========================================
@@ -153,17 +152,13 @@ def IsAirlineInTerminal(terminal, name):
 
 def SearchTerminal(bcn, name):
     for terminal in bcn.terminals:
-        # Use function IsAirlineInTerminal[cite: 1]
         result = IsAirlineInTerminal(terminal, name)
 
-        if type(result) is tuple:
-            is_in = result[0]
-        else:
-            is_in = result
-
-        if is_in == True:
+        # This safely ignores the (False, -1) tuple without crashing
+        if result == True:
             return terminal.name
 
+    return ""
     # If the airline is not found, the return name shall be a null string[cite: 1]
     return ""
 
