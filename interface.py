@@ -1,11 +1,55 @@
 import tkinter as tk
 from tkinter import messagebox
 from Aircraft import *
+from LEBL import * #add
 from airport import * # Import all your function
 from matplotlib import *
 # Global variable to store our list of airports in memory
 my_airports = []
 my_flights = []
+
+#def LEBL 
+# Variable globale pour l'aéroport de Barcelone
+bcn_structure = None
+
+def load_lebl():
+
+    global bcn_structure
+    bcn_structure = LoadAirportStructure("LEBL.txt")
+    if bcn_structure == -1:
+        messagebox.showerror("Error", "LEBL.txt not found!")
+    else:
+        print("Barcelona Airport structure loaded.")
+
+def assign_gate_click():
+    
+    selection = list_box_arrivals.curselection()
+    if not selection:
+        messagebox.showwarning("Warning", "Select a flight first!")
+        return
+    
+    if bcn_structure is None:
+        messagebox.showerror("Error", "Airport structure not loaded!")
+        return
+
+    index = selection[0]
+    flight = my_flights[index]
+    
+
+    result = AssignGate(bcn_structure, flight)
+    
+    if result == 0:
+  
+        occ = GateOccupancy(bcn_structure)
+        assigned_gate = "Unknown"
+        for g in occ:
+            if g[2] == flight.aircraft_id:
+                assigned_gate = g[0]
+        messagebox.showinfo("Success", f"Flight {flight.aircraft_id} assigned to Gate {assigned_gate}")
+    else:
+        messagebox.showerror("Failed", "No gate available or Airline not found in terminals.")
+
+
 def refresh_list():
     """Clears the display area and fills it with the updated list"""
     list_box_airports.delete(0, tk.END)
@@ -90,6 +134,8 @@ def map_flights():
 def map_long():
     ShowLongDistanceFlights(my_flights)
 
+#
+
 #Window of the interface
 window = tk.Tk()
 window.title("Airport Manager")
@@ -153,9 +199,15 @@ tk.Button(frame_flights, text="Flights on Map", width=20, command=map_flights).g
 
 tk.Button(frame_flights, text="Long Distance Flights on Map", width=42, command=map_long).grid(row=3, column=0, columnspan=2, pady=5)
 
+
+tk.Button(frame_flights, text="ASSIGN GATE", bg="orange", font=('bold'), width=42, command=assign_gate_click).grid(row=4, column=0, columnspan=2, pady=10)
 # Resizement configuration
 window.grid_rowconfigure(1, weight=1)
 window.grid_columnconfigure(0, weight=1)
 
-#Starter
+# load LEBL
+load_lebl()
+
+# Starter
 window.mainloop()
+
