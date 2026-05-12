@@ -152,12 +152,12 @@ def IsAirlineInTerminal(terminal, name):
 
 def SearchTerminal(bcn, name):
     for terminal in bcn.terminals:
-        result = IsAirlineInTerminal(terminal, name)
-        if result == True:
+        res = IsAirlineInTerminal(terminal, name)
+        # Si c'est un tuple, on prend le premier élément
+        is_in = res[0] if isinstance(res, tuple) else res
+        
+        if is_in:
             return terminal.name
-
-    return ""
-    # If the airline is not found, the return name shall be a null string[cite: 1]
     return ""
 
 
