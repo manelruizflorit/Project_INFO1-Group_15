@@ -35,7 +35,7 @@ if __name__ == "__main__":
         # We build a fake 'dummy' airplane just to test the parking code
         class MockAircraft:
             def __init__(self, flight_id, company, origin):
-                self.id = flight_id
+                self.aircraft_id = flight_id  # FIXED: Changed from self.id to self.aircraft_id
                 self.airline_company = company
                 self.origin_airport = origin
 
