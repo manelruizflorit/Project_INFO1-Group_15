@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Version3_Commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LEBL.py" beforeDir="false" afterPath="$PROJECT_DIR$/LEBL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test_LEBL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Test_LEBL.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +60,6 @@
     &quot;Python.Aircraft.executor&quot;: &quot;Debug&quot;,
     &quot;Python.Airport.executor&quot;: &quot;Run&quot;,
     &quot;Python.GoogleEarthfunction.executor&quot;: &quot;Run&quot;,
-    &quot;Python.LEBL.executor&quot;: &quot;Run&quot;,
     &quot;Python.LoadAriports.executor&quot;: &quot;Run&quot;,
     &quot;Python.Prova saveschengenairports.executor&quot;: &quot;Run&quot;,
     &quot;Python.Test_Aircraft.executor&quot;: &quot;Run&quot;,
@@ -291,15 +288,7 @@
       <option name="project" value="LOCAL" />
       <updated>1777976803733</updated>
     </task>
-    <task id="LOCAL-00021" summary="aaa">
-      <option name="closed" value="true" />
-      <created>1778578690858</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1778578690858</updated>
-    </task>
-    <option name="localTasksCounter" value="22" />
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -333,16 +322,5 @@
     <MESSAGE value="Final version 2" />
     <MESSAGE value="aaa" />
     <option name="LAST_COMMIT_MESSAGE" value="aaa" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Test_LEBL.py</url>
-          <line>57</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
