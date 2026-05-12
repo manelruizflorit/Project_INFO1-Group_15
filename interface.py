@@ -139,7 +139,7 @@ def map_long():
 #Window of the interface
 window = tk.Tk()
 window.title("Airport Manager")
-window.geometry("800x650")
+window.geometry("900x650")
 window.configure(padx=10, pady=10)
 
 # input frame

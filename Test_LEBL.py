@@ -1,4 +1,4 @@
-
+from LEBL import *
 # ==========================================
 # 3. TEST SECTION
 # This code only runs if you play this file directly.
@@ -66,5 +66,5 @@ if __name__ == "__main__":
                 print("  -> Gate " + g[0] + " is currently occupied by airplane " + g[2])
         else:
             print("No gates are currently occupied.")
-
     print("\n--- TESTS FINISHED ---")
+    print(all_gates)

@@ -47,7 +47,7 @@ def SetGates(area, init_gate, end_gate, prefix):
     # If the area had a previous list of gates, drop it[cite: 1]
     area.gates = []
 
-    for i in range(init_gate, end_gate + 1):
+    for i in range(init_gate, end_gate +1):
         # Create the name using basic string addition
         gate_name = prefix + str(i)
         new_gate = Gate(gate_name)
@@ -153,8 +153,6 @@ def IsAirlineInTerminal(terminal, name):
 def SearchTerminal(bcn, name):
     for terminal in bcn.terminals:
         result = IsAirlineInTerminal(terminal, name)
-
-        # This safely ignores the (False, -1) tuple without crashing
         if result == True:
             return terminal.name
 
@@ -194,62 +192,3 @@ def AssignGate(bcn, aircraft):
     # If there is no more free gates, an error code shall be returned[cite: 1]
     return -1
 
-
-# ==========================================
-# TEST SECTION
-# ==========================================
-if __name__ == "__main__":
-    print("--- STARTING VERSION 3 INTEGRATION TESTS ---")
-
-    # 1. Load the Airport
-    bcn_airport = LoadAirportStructure("LEBL.txt")
-
-    if bcn_airport == -1:
-        print(
-            "ERROR: Could not load LEBL.txt. Make sure LEBL.txt, T1_Airlines.txt, and T2_Airlines.txt are in the folder.")
-    else:
-        print("SUCCESS: Loaded Airport " + bcn_airport.code)
-
-        # 2. Load the real aircraft from your Arrivals text file!
-        # Make sure "Arrivals.txt" is in your folder.
-        real_flights = LoadArrivals("Arrivals.txt")
-
-        if not real_flights:
-            print("WARNING: Could not load Arrivals.txt. Place the file in the folder to test gate assignment.")
-        else:
-            print("SUCCESS: Loaded " + str(len(real_flights)) + " aircraft from Arrivals.txt")
-
-            # 3. Try to assign gates to the first 10 planes that landed
-            success_count = 0
-            fail_count = 0
-
-            # We only test the first 10 so we don't spam the console
-            planes_to_test = real_flights[:10]
-
-            for plane in planes_to_test:
-                result = AssignGate(bcn_airport, plane)
-                if result == 0:
-                    success_count += 1
-                else:
-                    fail_count += 1
-
-            print("\nAssignment Results for first 10 planes:")
-            print("- Successfully parked: " + str(success_count))
-            print("- Failed to park: " + str(fail_count) + " (Usually means airline not found in T1/T2 txt files)")
-
-            # 4. Check the occupancy list
-            all_gates = GateOccupancy(bcn_airport)
-            occupied_gates = []
-
-            for g in all_gates:
-                if g[1] == True:  # g[1] is the occupied status
-                    occupied_gates.append(g)
-
-            print("\nOccupied Gates List:")
-            if len(occupied_gates) > 0:
-                for g in occupied_gates:
-                    print("-> Gate " + g[0] + " is occupied by flight " + g[2])
-            else:
-                print("-> No gates are currently occupied.")
-
-    print("\n--- TESTS FINISHED ---")
