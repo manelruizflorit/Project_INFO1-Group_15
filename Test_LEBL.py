@@ -67,4 +67,3 @@ if __name__ == "__main__":
         else:
             print("No gates are currently occupied.")
     print("\n--- TESTS FINISHED ---")
-    print(all_gates)
