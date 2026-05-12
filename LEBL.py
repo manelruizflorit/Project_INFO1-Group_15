@@ -1,6 +1,5 @@
 import os
-from airport import IsSchengenAirport
-from Aircraft import Aircraft, LoadArrivals
+from Aircraft import *
 
 # ==========================================
 # CLASSES
