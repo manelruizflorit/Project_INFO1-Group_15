@@ -2,7 +2,7 @@
 
 import os
 from airport import IsSchengenAirport
-from aircraft import Aircraft, LoadArrivals
+from Aircraft import Aircraft, LoadArrivals
 
 
 # ==========================================

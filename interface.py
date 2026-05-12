@@ -1,8 +1,8 @@
+from LEBL import *
 import tkinter as tk
 from tkinter import messagebox
-from Aircraft import *
-from LEBL import * #add
-from airport import * # Import all your function
+#add
+# Import all your function
 from matplotlib import *
 # Global variable to store our list of airports in memory
 my_airports = []
