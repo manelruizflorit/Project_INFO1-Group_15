@@ -105,7 +105,7 @@ def plot_types():
 def map_flights():
     ShowFlights(my_flights)
 
-def longdistanceflights():
+def Longdistanceflights():
     ShowLongDistanceFlights(my_flights)
 
 
@@ -216,18 +216,15 @@ tk.Button(frame_flights, text="Plot per Airline", width=20, command=plot_airline
 tk.Button(frame_flights, text="Plot Schengen", width=20, command=plot_types).grid(row=2, column=0, pady=5)
 tk.Button(frame_flights, text="Flights on Map", width=20, command=map_flights).grid(row=2, column=1)
 
-tk.Button(frame_flights, text="Long Distance Flights on Map", width = 40, command=longDistanceFlights())
+tk.Button(frame_flights, text="Long Distance Flights on Map", width = 40, command=Longdistanceflights).grid(row=3, columnspan=2)
 
 # Gates frame (new)
 frame_gates = tk.LabelFrame(window, text="Gate Management", padx=10, pady=10)
 frame_gates.grid(row=3, column=0, columnspan=2, sticky="ew", pady=5, padx=0)
 
-tk.Button(frame_gates, text="Load LEBL Airport", width=20, bg="lightyellow",
-          command=load_bcn_airport).grid(row=0, column=0, padx=5, pady=5)
-tk.Button(frame_gates, text="Assign Gate", width=20, bg="lightgreen",
-          command=assign_gate).grid(row=0, column=1, padx=5, pady=5)
-tk.Button(frame_gates, text="Show Gate Occupancy", width=20, bg="lightsalmon",
-          command=show_gate_occupancy).grid(row=0, column=2, padx=5, pady=5)
+tk.Button(frame_gates, text="Load LEBL Airport", width=20, bg="lightyellow", command=load_bcn_airport).grid(row=0, column=0, padx=5, pady=5)
+tk.Button(frame_gates, text="Assign Gate", width=20, bg="lightgreen", command=assign_gate).grid(row=0, column=1, padx=5, pady=5)
+tk.Button(frame_gates, text="Show Gate Occupancy", width=20, bg="lightsalmon", command=show_gate_occupancy).grid(row=0, column=2, padx=5, pady=5)
 
 # Resizement configuration
 window.grid_rowconfigure(1, weight=1)
