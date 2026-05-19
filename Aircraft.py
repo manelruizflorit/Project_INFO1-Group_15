@@ -298,3 +298,15 @@ def ShowLongDistanceFlights(aircrafts):
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
+
+
+# Alex Project exam
+def ShowShortDistanceFlights(aircrafts):
+    not_short_distance = []
+    for f in aircrafts:
+        if Haversine(f.origin_airport) >= 1000:
+            not_short_distance.append(f)
+    show = MapFlights(not_short_distance)
+    if show == 0:
+        route_kml = os.path.join(os.getcwd(), "flights.kml")
+        os.system("open " + route_kml)
