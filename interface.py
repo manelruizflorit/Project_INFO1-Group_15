@@ -1,14 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
-
-from matplotlib.pyplot import grid
-
 from Aircraft import *
-from airport import * # Import all your function
+from airport import *  # Import all your function
+from LEBL import *
 from matplotlib import *
+
 # Global variable to store our list of airports in memory
 my_airports = []
 my_flights = []
+bcn_airport = None  # Barcelona airport structure
+
+
 def refresh_list():
     """Clears the display area and fills it with the updated list"""
     list_box_airports.delete(0, tk.END)
@@ -16,13 +18,15 @@ def refresh_list():
         status = "Schengen" if a.schengen else "Non-Schengen"
         list_box_airports.insert(tk.END, f"{a.code} - Lat: {a.lat} / Lon: {a.lon} ({status})")
 
+
 def load_file():
     """Loads the text file"""
     global my_airports
     my_airports = LoadAirports("Airports.txt")
     for a in my_airports:
-        SetSchengen(a) # Updates the Schengen status
+        SetSchengen(a)  # Updates the Schengen status
     refresh_list()
+
 
 def add_airport():
     """Adds an airport from the text fields"""
@@ -30,11 +34,11 @@ def add_airport():
     try:
         lat = float(entry_lat.get())
         lon = float(entry_lon.get())
-        
+
         new_airport = Airport(code, lat, lon)
         SetSchengen(new_airport)
         AddAirport(my_airports, new_airport)
-        
+
         refresh_list()
         # Clear the fields after adding
         entry_code.delete(0, tk.END)
@@ -43,67 +47,120 @@ def add_airport():
     except ValueError:
         messagebox.showerror("Error", "Latitude and longitude must be numbers!")
 
+
 def remove_selection():
     """Removes the selected row from the list"""
-    selection = list_box_airports.curselection() # Gets the clicked row
+    selection = list_box_airports.curselection()  # Gets the clicked row
     if selection:
         index = selection[0]
         code_to_remove = my_airports[index].code
         RemoveAirport(my_airports, code_to_remove)
         refresh_list()
 
+
 def save_file():
     """Saves only Schengen airports to the file"""
-    SaveSchengenAirports(my_airports,"Schengen_results.txt")
+    SaveSchengenAirports(my_airports, "Schengen_results.txt")
     messagebox.showinfo("Success", "Schengen airports saved!")
+
 
 def show_plot():
     """Displays the matplotlib graph"""
     PlotAirports(my_airports)
 
+
 def google_earth():
     ShowAirports(my_airports)
+
 
 def refresh_arrivals():
     list_box_arrivals.delete(0, tk.END)
     for f in my_flights:
         list_box_arrivals.insert(tk.END, f"{f.aircraft_id} {f.origin_airport} {f.landing_time} {f.airline_company}")
 
+
 def load_arrivals():
     global my_flights
     my_flights = LoadArrivals("Arrivals.txt")
     refresh_arrivals()
 
+
 def save_flights():
     SaveFlights(my_flights, "Saved_flights.txt")
     messagebox.showinfo("Success", "Arrivals saved!")
 
+
 def plot_arrivals():
     PlotArrivals(my_flights)
+
 
 def plot_airlines():
     PlotAirlines(my_flights)
 
+
 def plot_types():
     PlotFlightsType(my_flights)
+
 
 def map_flights():
     ShowFlights(my_flights)
 
-def map_long():
+def longdistanceflights():
     ShowLongDistanceFlights(my_flights)
 
-#Alex Project Exam
-def map_shortflights():
-    ShowShortDistanceFlights(my_flights)
 
-#Window of the interface
+def load_bcn_airport():
+    """Loads the LEBL airport structure from file"""
+    global bcn_airport
+    bcn_airport = LoadAirportStructure("LEBL.txt")
+    if bcn_airport == -1:
+        messagebox.showerror("Error", "Could not load LEBL.txt. Make sure the file exists.")
+        bcn_airport = None
+    else:
+        messagebox.showinfo("Success", f"Airport {bcn_airport.code} loaded successfully!")
+
+
+def assign_gate():
+    """Assigns a gate to the selected flight"""
+    global bcn_airport
+
+    if bcn_airport is None:
+        messagebox.showerror("Error", "Airport structure not loaded. Please load LEBL airport first.")
+        return
+
+    selection = list_box_arrivals.curselection()
+    if not selection:
+        messagebox.showerror("Error", "Please select a flight from the Arrivals list.")
+        return
+
+    index = selection[0]
+    aircraft = my_flights[index]
+
+    result = AssignGate(bcn_airport, aircraft)
+
+    if result == -1:
+        messagebox.showerror("Error", f"Could not assign a gate for flight {aircraft.aircraft_id}.\n"
+                                      "No free gates available or airline not found.")
+    else:
+        messagebox.showinfo("Gate Assigned",
+                            f"Gate successfully assigned to flight {aircraft.aircraft_id}!")
+
+
+def show_gate_occupancy():
+    """Shows gate occupancy — function to be implemented later"""
+    pass
+
+
+# ==========================================
+# WINDOW SETUP
+# ==========================================
+
 window = tk.Tk()
 window.title("Airport Manager")
-window.geometry("800x650")
+window.geometry("800x750")
 window.configure(padx=10, pady=10)
 
-# input frame
+# Input frame
 frame_inputs = tk.LabelFrame(window, text="Add Airport", padx=10, pady=10)
 frame_inputs.grid(row=0, column=0, sticky="ew", pady=5)
 
@@ -119,7 +176,8 @@ tk.Label(frame_inputs, text="Longitude ").grid(row=2, column=0)
 entry_lon = tk.Entry(frame_inputs)
 entry_lon.grid(row=2, column=1)
 
-tk.Button(frame_inputs, text="Add Airport", bg="lightblue", command=add_airport).grid(row=3, column=0, columnspan=2, pady=5)
+tk.Button(frame_inputs, text="Add Airport", bg="lightblue", command=add_airport).grid(row=3, column=0, columnspan=2,
+                                                                                      pady=5)
 
 # Airports list
 frame_list_airports = tk.LabelFrame(window, text="Airports", padx=10, pady=10)
@@ -128,7 +186,7 @@ frame_list_airports.grid(row=1, column=0, sticky="nsew")
 list_box_airports = tk.Listbox(frame_list_airports, height=12)
 list_box_airports.pack(fill="both", expand=True)
 
-#Arrivals list
+# Arrivals list
 frame_list_arrivals = tk.LabelFrame(window, text="Arrivals", padx=10, pady=10)
 frame_list_arrivals.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
 
@@ -158,14 +216,22 @@ tk.Button(frame_flights, text="Plot per Airline", width=20, command=plot_airline
 tk.Button(frame_flights, text="Plot Schengen", width=20, command=plot_types).grid(row=2, column=0, pady=5)
 tk.Button(frame_flights, text="Flights on Map", width=20, command=map_flights).grid(row=2, column=1)
 
-#Alex project exam
-tk.Button(frame_flights, text="Remove Short Distance Flights and Map the rest", width=20, command=map_shortflights).grid(row=3,column=1)
+tk.Button(frame_flights, text="Long Distance Flights on Map", width = 40, command=longDistanceFlights())
 
-tk.Button(frame_flights, text="Long Distance Flights on Map", width=42, command=map_long).grid(row=4, column=0, columnspan=2, pady=5)
+# Gates frame (new)
+frame_gates = tk.LabelFrame(window, text="Gate Management", padx=10, pady=10)
+frame_gates.grid(row=3, column=0, columnspan=2, sticky="ew", pady=5, padx=0)
+
+tk.Button(frame_gates, text="Load LEBL Airport", width=20, bg="lightyellow",
+          command=load_bcn_airport).grid(row=0, column=0, padx=5, pady=5)
+tk.Button(frame_gates, text="Assign Gate", width=20, bg="lightgreen",
+          command=assign_gate).grid(row=0, column=1, padx=5, pady=5)
+tk.Button(frame_gates, text="Show Gate Occupancy", width=20, bg="lightsalmon",
+          command=show_gate_occupancy).grid(row=0, column=2, padx=5, pady=5)
 
 # Resizement configuration
 window.grid_rowconfigure(1, weight=1)
 window.grid_columnconfigure(0, weight=1)
 
-#Starter
+# Starter
 window.mainloop()

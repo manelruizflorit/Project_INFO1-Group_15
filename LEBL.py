@@ -53,7 +53,7 @@ def SetGates(area, init_gate, end_gate, prefix):
 
 def LoadAirlines(terminal, t_name):
     # Build the file name
-    filename = t_name + "_Airlines.txt"
+    filename = str(t_name) + "_Airlines.txt"
 
     try:
         with open(filename, 'r') as f:
@@ -139,7 +139,7 @@ def GateOccupancy(bcn):
 def IsAirlineInTerminal(terminal, name):
     # Return False if name is empty
     if name == "":
-        return False
+        return False, -1
 
     if name in terminal.airlines:
         return True

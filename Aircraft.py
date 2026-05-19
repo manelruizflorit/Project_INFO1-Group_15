@@ -33,7 +33,7 @@ def LoadArrivals(filename):
 
             parts = line.split()
             if len(parts) == 4:
-                if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3: #we need sharuk to improve our filter on time and numbers
+                if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3:
                     linea = True
                 elif linea == False:
                     aircraft_id = str(parts[0]).upper()
@@ -299,14 +299,3 @@ def ShowLongDistanceFlights(aircrafts):
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
 
-
-# Alex Project exam
-def ShowShortDistanceFlights(aircrafts):
-    not_short_distance = []
-    for f in aircrafts:
-        if Haversine(f.origin_airport) >= 1000:
-            not_short_distance.append(f)
-    show = MapFlights(not_short_distance)
-    if show == 0:
-        route_kml = os.path.join(os.getcwd(), "flights.kml")
-        os.system("open " + route_kml)
