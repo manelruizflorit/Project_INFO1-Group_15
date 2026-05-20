@@ -5,13 +5,15 @@ from Aircraft import *
 # CLASSES
 # ==========================================
 
+# Represents a single gate with a name, an occupancy boolean, and the ID of the aircraft occupying it
 class Gate:
     def __init__(self, name):
         self.name = name
-        self.occupied = False
-        self.aircraft_id = ""
+        self.occupied = False       # Starts as free
+        self.aircraft_id = ""       # Empty until a plane is assigned
 
 
+# Represents a boarding area with a name, a Schengen type, and a list of Gate objects
 class BoardingArea:
     def __init__(self, name, area_type):
         self.name = name
@@ -19,6 +21,7 @@ class BoardingArea:
         self.gates = []
 
 
+# Represents a terminal with a name, a list of BoardingArea objects, and a list of airline ICAO codes operating in it
 class Terminal:
     def __init__(self, name):
         self.name = name
@@ -26,6 +29,7 @@ class Terminal:
         self.airlines = []      # List of ICAO airline codes (3-char)
 
 
+# Represents the Barcelona airport with its ICAO code and a list of Terminal objects
 class BarcelonaAP:
     def __init__(self, code):
         self.code = code
@@ -36,14 +40,17 @@ class BarcelonaAP:
 # FUNCTIONS
 # ==========================================
 
+# Clears any existing gates in the area and fills it with new Gate objects named by combining the prefix and gate number
+# Returns -1 if the end gate is not greater than the start gate
 def SetGates(area, init_gate, end_gate, prefix):
-    # If end_gate is not greater than init_gate, return error
+    # Returns error if the gate range is invalid
     if end_gate <= init_gate:
         return -1
 
-    # Drop previous list of gates
+    # Drops the previous list of gates
     area.gates = []
 
+    # Creates a new gate for each number in the range and adds it to the area
     for i in range(init_gate, end_gate + 1):
         gate_name = prefix + str(i)
         area.gates.append(Gate(gate_name))
@@ -51,17 +58,21 @@ def SetGates(area, init_gate, end_gate, prefix):
     return 0
 
 
+# Reads the airlines file for the given terminal name and updates the terminal's airline list with the ICAO codes found
+# Returns -1 if the file doesn't exist, 0 on success
 def LoadAirlines(terminal, t_name):
-    # Build the file name
+    # Builds the file name from the terminal name
     filename = str(t_name) + "_Airlines.txt"
 
     try:
         with open(filename, 'r') as f:
+            # Drops the previous list of airlines
             terminal.airlines = []
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
+                # Splits by tab and takes the ICAO code in the second column
                 parts = line.split('\t')
                 if len(parts) >= 2:
                     terminal.airlines.append(parts[1].strip())
@@ -71,6 +82,8 @@ def LoadAirlines(terminal, t_name):
         return -1
 
 
+# Reads the airport structure file and builds a BarcelonaAP object with all its terminals, boarding areas, and gates
+# Calls SetGates and LoadAirlines along the way, returns -1 if the file doesn't exist
 def LoadAirportStructure(filename):
     try:
         with open(filename, 'r') as f:
@@ -81,7 +94,7 @@ def LoadAirportStructure(filename):
     if not lines:
         return -1
 
-    # First line: "LEBL 2 terminals"
+    # First line contains the airport code
     bcn = BarcelonaAP(lines[0].split()[0])
 
     current_terminal = None
@@ -92,43 +105,40 @@ def LoadAirportStructure(filename):
             continue
 
         if stripped.startswith("Terminal"):
-            # "Terminal T1 5 boarding areas"
+            # Creates a new terminal and loads its airlines from file
             t_name = stripped.split()[1]
             current_terminal = Terminal(t_name)
             bcn.terminals.append(current_terminal)
             LoadAirlines(current_terminal, t_name)
 
         elif stripped.startswith("Area"):
-            # "Area A Schengen Gates 1 - 11"
-            # "Area D non-Schengen Gates 1 - 11"
             if current_terminal is None:
                 continue
 
+            # Reads the area name and type from the line
             area_name = stripped.split()[1]
-
-            # The type is everything between the area name and "Gates"
             gates_idx = stripped.index("Gates")
             area_type = stripped[stripped.index(area_name) + len(area_name):gates_idx].strip()
 
-            # Gate numbers are after "Gates": "1 - 11"
+            # Reads the gate range from the line
             after_gates = stripped[gates_idx + len("Gates"):].strip()
             range_parts = after_gates.split('-')
             init_gate = int(range_parts[0].strip())
             end_gate = int(range_parts[1].strip())
 
+            # Creates the boarding area and fills it with gates using a unique prefix
             new_area = BoardingArea(area_name, area_type)
             current_terminal.boarding_areas.append(new_area)
-
-            # Unique prefix so gate names encode terminal + area
             prefix = current_terminal.name + area_name + "G"
             SetGates(new_area, init_gate, end_gate, prefix)
 
     return bcn
 
 
+# Loops through all terminals, boarding areas, and gates and returns a list with each gate's name, occupancy status, and aircraft ID
 def GateOccupancy(bcn):
-    # Returns a list of [gate_name, occupied, aircraft_id] for every gate
     occupancy_list = []
+    # Loops through every terminal, area, and gate to collect their status
     for terminal in bcn.terminals:
         for area in terminal.boarding_areas:
             for gate in area.gates:
@@ -136,43 +146,50 @@ def GateOccupancy(bcn):
     return occupancy_list
 
 
+# Checks if a given airline name is in the terminal's airline list
+# Returns False and an error code if the name is empty, True if found, False otherwise
 def IsAirlineInTerminal(terminal, name):
-    # Return False if name is empty
+    # Returns False and error code if the name is empty
     if name == "":
         return False, -1
 
+    # Returns True if the airline is in the list
     if name in terminal.airlines:
         return True
 
     return False
 
 
+# Loops through all terminals to find which one the given airline operates in
+# Returns the terminal name if found, or an empty string if not
 def SearchTerminal(bcn, name):
-    # Return empty string if name is invalid
+    # Returns empty string if the airline name is invalid
     if name == "":
         return ""
 
+    # Checks each terminal until the airline is found
     for terminal in bcn.terminals:
         if IsAirlineInTerminal(terminal, name):
             return terminal.name
 
-    # Airline not found in any terminal
     return ""
 
 
+# Finds the correct terminal and gate type for the aircraft, then assigns the first free matching gate
+# Returns -1 if no terminal is found or no free gate is available, 0 on success
 def AssignGate(bcn, aircraft):
-    # 1. Find the terminal for this airline
+    # Finds the terminal for this airline
     req_terminal = SearchTerminal(bcn, aircraft.airline_company)
     if req_terminal == "":
         return -1
 
-    # 2. Determine Schengen type of the origin airport
+    # Determines whether the flight is Schengen or non-Schengen
     if IsSchengenAirport(aircraft.origin_airport):
         req_type = "Schengen"
     else:
         req_type = "non-Schengen"
 
-    # 3. Find first free gate in the correct terminal + area type
+    # Loops through terminals and areas to find the first free gate of the correct type
     for terminal in bcn.terminals:
         if terminal.name != req_terminal:
             continue
@@ -180,12 +197,10 @@ def AssignGate(bcn, aircraft):
             if area.type != req_type:
                 continue
             for gate in area.gates:
+                # Assigns the gate and marks it as occupied
                 if not gate.occupied:
                     gate.occupied = True
                     gate.aircraft_id = aircraft.aircraft_id
                     return 0
 
-    # No free gate found
     return -1
-
-
