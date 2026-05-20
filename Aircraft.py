@@ -4,8 +4,7 @@ from math import radians, cos
 
 from airport import *
 
-#We define a new class, aircaft:
-
+# Represents an arriving aircraft with its ID, origin airport, landing time and airline company
 class Aircraft:
     def __init__(self, aircraft_id, origin_airport, landing_time, airline_company):
         self.aircraft_id = aircraft_id #string of the aircraft
@@ -14,15 +13,18 @@ class Aircraft:
         self.landing_time = landing_time # 5 characters with the format: hh:mm
 
 
-
+# Opens a text file and reads arrival data line by line, skipping the header and any malformed lines
+# Returns a list of Aircraft objects, or an empty list if the file doesn't exist
 def LoadArrivals(filename):
     arrivals_list = []
     linea = False
+    # Returns an empty list if the file doesn't exist
     if not os.path.exists(filename):
         return []
     with open(filename, 'r') as q:
         lines = q.readlines()
 
+        # Returns empty list if the file has only a header or is empty
         if len(lines) <= 1:
             return []
 
@@ -33,9 +35,11 @@ def LoadArrivals(filename):
 
             parts = line.split()
             if len(parts) == 4:
+                # Skips the line if any field has an incorrect length
                 if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3:
                     linea = True
                 elif linea == False:
+                    # Creates a new Aircraft object and adds it to the list
                     aircraft_id = str(parts[0]).upper()
                     new_aircraft = Aircraft(aircraft_id, parts[1], parts[2], parts[3])
                     arrivals_list.append(new_aircraft)
@@ -44,36 +48,38 @@ def LoadArrivals(filename):
 
     return arrivals_list
 
+# Counts the number of arrivals per hour of the day and displays a bar chart
+# Shows an error message and returns if the list is empty
 def PlotArrivals(aircrafts):
     # We check if the list is empty and create an error message
     if not aircrafts:
         print("Error: The arrivals list is empty. The graphic cannot be generated.")
         return
 
-    # We create a list with a 0 for every hour of the day
+    # Creates a list with a 0 for every hour of the day
     arrivals_per_hour = [0] * 24
 
-    # We check every aircraft's arrival time and codes
+    # Checks every aircraft's arrival time and codes
     for aircraft in aircrafts:
         try:
-            # We take only the hours in the time for every arrival and add them up
+            # Takes only the hours in the time for every arrival and adds them up
             hour_str = aircraft.landing_time.split(':')[0]
             hour = int(hour_str)
 
             if 0 <= hour <= 23:
                 arrivals_per_hour[hour] += 1
         except (ValueError, IndexError):
-            # We skip if a time doesn't have the right value
+            # Skips if a time doesn't have the right value
             continue
 
-    # We create the labels for the axes
+    # Creates the labels for the axes
     hours_labels = [f"{i:02d}:00" for i in range(24)]
 
-    # We make the bar plot to show everything and set colors to the bars
+    # Makes the bar plot to show everything and sets colors to the bars
     plt.figure(figsize=(10, 6))
     plt.bar(hours_labels, arrivals_per_hour, color='skyblue', edgecolor='black')
 
-    # We add titles and imporve design
+    # Add titles and improves design
     plt.title('Arrivals per hour in LEBL')
     plt.xlabel('Time of the day')
     plt.ylabel('Number of arrivals')
@@ -84,45 +90,48 @@ def PlotArrivals(aircrafts):
     plt.tight_layout()
     plt.show()
 
+# Writes the aircraft list to a file in the same format as the input file
+# Returns -1 if the list is empty or if writing fails, 0 on success
 def SaveFlights(aircrafts, filename):
-    # If the list is empty → error
+    # Returns error code if the list is empty
     if not aircrafts:
         print("Error: The aircraft list is empty. No file created.")
         return -1  # error code
 
     try:
         with open(filename, 'w') as f:
-            # Write header (adjust if your input header is different)
+            # Writes a header
             f.write("AIRCRAFT ORIGIN TIME AIRLINE\n")
 
             for aircraft in aircrafts:
-                # Replace empty fields
+                # Replaces empty fields with a placeholder
                 a_id = aircraft.aircraft_id if aircraft.aircraft_id else "-"
                 origin = aircraft.origin_airport if aircraft.origin_airport else "-"
                 time = aircraft.landing_time if aircraft.landing_time else "00:00"
                 airline = aircraft.airline_company if aircraft.airline_company else "-"
 
-                # Write line in same format as input
+                # Writes lines in same format as the input
                 f.write(f"{a_id} {origin} {time} {airline}\n")
 
-        return 0  # success
+        return 0
 
     except Exception as e:
         print(f"Error writing file: {e}")
         return -1
 
-
+# Counts the number of flights per airline and displays a bar chart
+# Shows an error message and returns nothing if the list is empty
 def PlotAirlines(aircrafts):
-    # Check if empty
+    # Checks if the list is empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
         return
 
-    # Create empty vectors
+    # Creates two empty vectors
     airlines = []
     counts = []
 
-    # Count manually
+    # Counts manually
     for aircraft in aircrafts:
         airline = aircraft.airline_company
         if airline in airlines:
@@ -132,7 +141,7 @@ def PlotAirlines(aircrafts):
             airlines.append(airline)
             counts.append(1)
 
-    # Plot
+    # Plots the two created lists
     plt.figure(figsize=(10, 6))
     plt.bar(airlines, counts, edgecolor='black')
 
@@ -144,17 +153,19 @@ def PlotAirlines(aircrafts):
     plt.tight_layout()
     plt.show()
 
+# Counts Schengen and non-Schengen flights based on origin airport and displays a stacked bar chart
+# Shows an error message and returns if the list is empty
 def PlotFlightsType(aircrafts):
-    # Check if empty
+    # Checks if the list is empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
         return
 
-    # Create counters
+    # Creates two counters
     schengen_count = 0
     non_schengen_count = 0
 
-    # Count manually
+    # Counts manually
     for aircraft in aircrafts:
 
         if IsSchengenAirport(aircraft.origin_airport) == True:
@@ -162,12 +173,12 @@ def PlotFlightsType(aircrafts):
         else:
             non_schengen_count += 1
 
-    #Data for plot
+    # Takes the data for plot
     labels = ["Flights"]
     schengen_values = [schengen_count]
     non_schengen_values = [non_schengen_count]
 
-    # Plot
+    # Plots the data (two vectors)
     plt.figure(figsize=(10, 6))
     plt.bar(labels, schengen_values, label = "Schengen", edgecolor='black')
     plt.bar(labels, non_schengen_values, bottom = schengen_values, label="Non-Schengen", edgecolor='black')
@@ -180,7 +191,10 @@ def PlotFlightsType(aircrafts):
     plt.tight_layout()
     plt.show()
 
+# Searches the Airports.txt file for the given ICAO code and returns its latitude and longitude as a list
+# Returns empty if the code is not found or an error occurs
 def Coordenates(Airport_code):
+    # Returns early if no code is provided
     if not Airport_code:
         print("Error, there's no airport ICAO code")
         return
@@ -200,6 +214,7 @@ def Coordenates(Airport_code):
                 parts = line.split()
                 if len(parts) == 3:
                     code = parts[0]
+                    # Checks if the code matches and converts coordinates to decimal
                     if code == str(Airport_code):
                         if parts[1][0] in ['N', 'S', 'E', 'W']:
                             lat_dec = ConvertToDecimal(parts[1])
@@ -207,12 +222,16 @@ def Coordenates(Airport_code):
                         else:
                             lat_dec = float(parts[1])
                             lon_dec = float(parts[2])
+        # Stores the result in the coordinates list
         coordenadas[0] = lat_dec
         coordenadas[1] = lon_dec
     except ValueError:
         return []
     return coordenadas
 
+# Generates a KML file (flights.kml) with a line for each flight from its origin airport to LEBL
+# Lines are colored cyan for Schengen origins and red for non-Schengen
+# Returns 0 on success, -1 on failure or empty list
 def MapFlights(flights):
     if not flights:
         return -1
@@ -228,20 +247,23 @@ def MapFlights(flights):
         while i < len(flights):
             flight = flights[i]
             origin = flight.origin_airport
+            # Sets the pin color based on the airport's Schengen status
             if IsSchengenAirport(origin):
                 color = "ff00ffff"
             else:
                 color = "ffff0000"
 
+            # Fixed coordinates for LEBL as the destination airport
             lat_final = 41.2969
             lon_final = 2.0784
 
+            # Gets the origin airport coordinates from the file
             cordenadas = Coordenates(origin)
 
             lon_inicial = cordenadas[1]
             lat_inicial = cordenadas[0]
 
-
+            # Writes a placemark with a line from the origin airport to LEBL
             f.write("   <Placemark>\n")
             f.write("   <name>" + str(flight.aircraft_id) + "</name>\n")
             f.write("   <Style><LineStyle><color>" + color + "</color><width>2</width></LineStyle></Style>\n")
@@ -263,39 +285,48 @@ def MapFlights(flights):
     except IOError:
         return -1
 
+# Calls MapFlights to generate the KML file and opens it with the system's default application
 def ShowFlights(list):
     show = MapFlights(list)
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
 
+# Calculates the great-circle distance in km between the given airport and LEBL using the Haversine formula
 def Haversine(Origin_airport_code):
+    # Gets the coordinates of both the origin airport and LEBL
     cords = Coordenates(Origin_airport_code)
     leblcords = Coordenates("LEBL")
     earth_radius = 6371
+    # Calculates the differences in latitude and longitude
     d_lat = abs(cords[0]-leblcords[0])
     d_lon = abs(cords[1]-leblcords[1])
+    # Applies the Haversine formula to get the distance
     a = math.sin(math.radians(d_lat) / 2)**2 + math.cos(math.radians(cords[0]))*math.cos(math.radians(leblcords[0]))*math.sin(math.radians(d_lon) / 2)**2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     d = earth_radius * c
     return d
 
+# Filters the arrivals list and returns only aircraft coming from airports more than 2000 km away from LEBL
+# Returns an empty list if the input is empty
 def LongDistanceArrivals(arrivals):
     long_distance =[]
+    # Returns empty list if no arrivals are provided
     if not arrivals:
         return []
     i = 0
     while i < len(arrivals):
         origen = arrivals[i].origin_airport
+        # Adds the aircraft to the list if its origin is more than 2000 km away
         if Haversine(origen) > 2000:
             long_distance.append(arrivals[i])
         i += 1
     return long_distance
 
+# Filters long distance arrivals and opens their flight paths in Google Earth via a KML file
 def ShowLongDistanceFlights(aircrafts):
     flights = LongDistanceArrivals(aircrafts)
     show = MapFlights(flights)
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
-

@@ -33,7 +33,6 @@ def PrintAirport(airport):
 # Converts a coordinate string in the format used in the data file (e.g. N635906) into a decimal degrees float
 # Handles both latitude (7 characters) and longitude (8 characters), and applies a negative sign for South or West directions
 def ConvertToDecimal(coord_str):
-    """ Converts N635906 to decimal degrees """
     direction = coord_str[0]
     if len(coord_str) == 7:
         # Handles latitude
@@ -140,7 +139,7 @@ def AddAirport(airports, airport):
     airports.append(airport)
 
 # Searches the list for an airport matching the given code and removes it
-# Returns 0 on success, -1 if the airport wasn't found.
+# Returns 0 on success, -1 if the airport wasn't found
 def RemoveAirport(airports, code):
     for i in range(len(airports)):
         if airports[i].code == code:
