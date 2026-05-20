@@ -3,6 +3,7 @@ from fileinput import filename
 
 import matplotlib.pyplot as plt
 
+
 # Definition of our Airport class with four categories: ICAO code, latitude, longitude, Schengen zone or not (Always starts with false)
 class Airport:
     def __init__(self, code, lat, lon):
@@ -11,24 +12,28 @@ class Airport:
         self.lon = lon
         self.schengen = False
 
+
 # Takes an ICAO code and checks if the first two letters match any Schengen country prefix
 # Returns True if it does, False if not or if the code is empty
 def IsSchengenAirport(code):
     if not code:
         return False
     # List of prefixes for Schengen countries
-    schengen_codes = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH', 
+    schengen_codes = ['LO', 'EB', 'LK', 'LC', 'EK', 'EE', 'EF', 'LF', 'ED', 'LG', 'EH', 'LH',
                       'BI', 'LI', 'EV', 'EY', 'EL', 'LM', 'EN', 'EP', 'LP', 'LZ', 'LJ', 'LE', 'ES', 'LS']
     return code[:2].upper() in schengen_codes
+
 
 # Takes an airport object and updates its schengen attribute by calling IsSchengenAirport with its code
 def SetSchengen(airport):
     airport.schengen = IsSchengenAirport(airport.code)
 
+
 # Prints the airport's code, latitude, longitude, and Schengen status to the console in a readable format
 def PrintAirport(airport):
     status = "Schengen" if airport.schengen else "Non-Schengen"
     print(f"ICAO: {airport.code} / Lat: {airport.lat} / Lon: {airport.lon} / Zone: {status}")
+
 
 # Converts a coordinate string in the format used in the data file (e.g. N635906) into a decimal degrees float
 # Handles both latitude (7 characters) and longitude (8 characters), and applies a negative sign for South or West directions
@@ -49,23 +54,26 @@ def ConvertToDecimal(coord_str):
 
     # The calculation works now as the code is in numbers
     decimal = deg + (minutes / 60.0) + (seconds / 3600.0)
-    
+
     if direction == 'S' or direction == 'W':
         decimal = -decimal
-        
+
     return round(decimal, 6)
+
 
 # Opens a text file and reads airport data line by line (skipping the header)
 # For each line, it breaks down the code and coordinates (converting from string format to decimal if needed) and returns a list of Airport objects
 # Returns an empty list if the file doesn't exist
 def LoadAirports(filename):
     airports_list = []
+    # Returns an empty list if the file doesn't exist
     if not os.path.exists(filename):
         return []
 
     with open(filename, 'r') as f:
         lines = f.readlines()
-        
+
+        # Returns an empty list if the file has only a header or is empty
         if len(lines) <= 1:
             return []
 
@@ -73,24 +81,26 @@ def LoadAirports(filename):
             line = lines[i].strip()
             if not line:
                 continue
-            
+
             parts = line.split()
             if len(parts) == 3:
                 code = parts[0]
-                
-                # If the latitude and longitude start with a NSEW letter, it pulls the ConvertToDecimal function on it
+
+                # If the coordinates start with a NSEW letter, converts them to decimal
                 if parts[1][0] in ['N', 'S', 'E', 'W']:
                     lat_dec = ConvertToDecimal(parts[1])
                     lon_dec = ConvertToDecimal(parts[2])
-                # If the latitude and longitude are already in decimal numbers, it pulls the numbers itseld
+                # If the coordinates are already decimal numbers, reads them directly
                 else:
                     lat_dec = float(parts[1])
                     lon_dec = float(parts[2])
-                    
+
+                # Creates a new Airport object and adds it to the list
                 new_airport = Airport(code, lat_dec, lon_dec)
                 airports_list.append(new_airport)
-                    
+
     return airports_list
+
 
 # Filters a list of airports to keep only the Schengen ones, then writes them to a file in the same format as the input file
 # Returns -1 if there are no Schengen airports to save
@@ -102,13 +112,14 @@ def SaveSchengenAirports(airports, filename):
             schengen_only.append(a)
 
     if len(schengen_only) == 0:
-        return -1 # Error code
-    
+        return -1  # Error code
+
     with open(filename, 'w') as f:
         f.write("CODE LAT LON\n")
         for a in schengen_only:
             f.write(f"{a.code} {a.lat} {a.lon}\n")
     return 0
+
 
 # Counts how many airports in the list are Schengen and how many are not
 # Then displays a stacked bar chart using matplotlib to visualize the split
@@ -122,7 +133,7 @@ def PlotAirports(airports):
         else:
             nb_ns = nb_ns + 1
 
-    # Plotting
+    # Plots the two counts as a stacked bar chart
     plt.bar("Airports", nb_s, color='blue', label='Schengen')
     plt.bar("Airports", nb_ns, bottom=nb_s, color='red', label='Non Schengen')
     plt.title("Schengen Airport")
@@ -130,13 +141,15 @@ def PlotAirports(airports):
     plt.legend()
     plt.show()
 
+
 # Adds an airport to the list only if no airport with the same code already exists in it
 # Does nothing if it's a duplicate
 def AddAirport(airports, airport):
     for a in airports:
         if a.code == airport.code:
-            return # Already exists
+            return  # Already exists
     airports.append(airport)
+
 
 # Searches the list for an airport matching the given code and removes it
 # Returns 0 on success, -1 if the airport wasn't found
@@ -146,6 +159,7 @@ def RemoveAirport(airports, code):
             airports.pop(i)
             return 0
     return -1
+
 
 # Generates a KML file (airports.kml) that can be opened in Google Earth
 # Each airport is added as a placemark with a colored pin (cyan for Schengen, red for non-Schengen)
@@ -161,11 +175,13 @@ def MapAirports(airports):
             file.write('<Document>\n')
             i = 0
             while i < len(airports):
+                # Sets the Schengen status and picks the pin color accordingly
                 SetSchengen(airports[i])
-                if airports[i].schengen :
+                if airports[i].schengen:
                     pin_color = "ff00ffff"
                 else:
                     pin_color = "ffff0000"
+                # Writes a placemark for the airport with its name, color, and coordinates
                 airport = airports[i]
                 file.write('  <Placemark>\n')
                 file.write('    <name>' + airport.code + '</name>\n')
@@ -178,6 +194,7 @@ def MapAirports(airports):
                 file.write('      </IconStyle>\n')
                 file.write('    </Style>')
                 file.write('    <Point>\n')
+                # Combines longitude and latitude into the coordinates string
                 coords = str(airport.lon) + "," + str(airport.lat)
                 file.write('      <coordinates>' + coords + '</coordinates>\n')
                 file.write('    </Point>\n')
@@ -188,6 +205,7 @@ def MapAirports(airports):
         return 0
     except IOError:
         return -1
+
 
 # Calls MapAirports to generate the KML file
 # Opens the file directly with the system's default application (Google Earth) using os.startfile
