@@ -6,11 +6,13 @@ from airport import *
 
 # Represents an arriving aircraft with its ID, origin airport, landing time and airline company
 class Aircraft:
-    def __init__(self, aircraft_id, origin_airport, landing_time, airline_company):
+    def __init__(self, aircraft_id, origin_airport, landing_time, airline_company, destination_airport, deparature_time):
         self.aircraft_id = aircraft_id #string of the aircraft
         self.airline_company = airline_company #3 characters with the ICAO code of the airline
         self.origin_airport = origin_airport #4 characters with the ICAO code of the airport the aircraft is coming from
         self.landing_time = landing_time # 5 characters with the format: hh:mm
+        self.destination_airport = destination_airport #4 characters with the ICAO code of the airport the aircraft is coming from
+        self.deparature_time = deparature_time  # 5 characters with the format: hh:mm
 
 
 # Opens a text file and reads arrival data line by line, skipping the header and any malformed lines
@@ -330,3 +332,80 @@ def ShowLongDistanceFlights(aircrafts):
     if show == 0:
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
+
+def LoadDepartures (filename):
+    deparatures_list = []
+    # Returns an empty list if the file doesn't exist
+    if not os.path.exists(filename):
+        return []
+    with open(filename, 'r') as q:
+        line = q.readlines()
+
+        # Returns empty list if the file has only a header or is empty
+        if len(line) <= 1:
+            return []
+
+        for i in range(1, len(line)):
+            line = line[i].strip()
+            if not line:
+                continue
+            parts = line.split()
+            if len(parts) == 4:
+                # Skips the line if any field has an incorrect length
+                if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3:
+                    line = True
+                elif line == False:
+                    # Creates a new Aircraft object and adds it to the list
+                    aircraft_id = str(parts[0]).upper()
+                    new_aircraft = Aircraft
+                    new_aircraft.aircraft_id = aircraft_id
+                    new_aircraft.destination_airport = parts[1]
+                    new_aircraft.origin_airport = "LEBL"
+                    new_aircraft.airline_company = parts[3]
+                    new_aircraft.deparature_time = parts[2]
+                    deparatures_list.append(new_aircraft)
+                else:
+                    line = False
+
+    return deparatures_list
+
+def MergeMovements(arrivals, departures):
+    # Returns error code if either list is empty
+    if not arrivals or not departures:
+        return -1
+
+    merged_list = []
+
+    for a in arrivals:
+        arrival_hour = a.landing_time.split(":")[0]
+        for d in departures:
+            deparature_hour = d.deparature_time.split(":")[0]
+            # Checks if same aircraft ID and landing time is before departure time
+            if a.aircraft_id == d.aircraft_id and arrival_hour < deparature_hour:
+                # Creates a merged Aircraft with both arrival and departure data
+                new_aircraft = Aircraft(
+                    a.aircraft_id,
+                    a.origin_airport,
+                    a.landing_time,
+                    a.airline_company,
+                    d.destination_airport,
+                    d.deparature_time
+                )
+                merged_list.append(new_aircraft)
+
+    return merged_list
+
+def NightAircraft(aircrafts):
+    # Returns error code if the list is empty
+    if not aircrafts:
+        return -1
+
+    night_list = []
+
+    for aircraft in aircrafts:
+        # Checks if the aircraft has no arrival but has departure information
+        if aircraft.landing_time and aircraft.origin_airport == "LEBL":
+            night_list.append(aircraft)
+
+    return night_list
+

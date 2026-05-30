@@ -204,3 +204,107 @@ def AssignGate(bcn, aircraft):
                     return 0
 
     return -1
+
+# Assigns a gate to each night aircraft (departure only, no arrival data)
+# Returns -1 if the list is empty or if any aircraft has arrival data it is skipped
+def AssignNightGates(bcn, aircrafts):
+    # Returns error code if the list is empty
+    if not aircrafts:
+        return -1
+
+    for aircraft in aircrafts:
+        # Skips aircraft that have arrival data (not a night aircraft)
+        if aircraft.landing_time and aircraft.original_airport == "LEBL":
+            AssignGate(bcn,aircraft)
+
+    return 0
+
+
+# Finds the gate assigned to the given aircraft ID and sets it to free
+# Returns -1 if the aircraft is not found in any gate, 0 on success
+def FreeGate(bcn, id):
+    # Loops through all terminals, areas and gates to find the aircraft
+    for terminal in bcn.terminals:
+        for area in terminal.boarding_areas:
+            for gate in area.gates:
+                if gate.aircraft_id == id:
+                    gate.occupied = False
+                    gate.aircraft_id = ""
+                    return 0
+
+    return -1
+
+
+# Frees gates of departed aircraft and assigns gates to aircraft landing in the one-hour period starting at time
+# Returns the number of aircraft that could not be assigned a gate due to full occupancy
+def AssignGatesAtTime(bcn, aircrafts, time):
+    not_assigned = 0
+
+    # Calculates the end of the one-hour period
+    hour = int(time.split(':')[0])
+    next_hour = (hour + 1) % 24
+    time_end = str(next_hour) + ":00"
+
+    # Frees gates of aircraft that have already departed before the current time
+    for aircraft in aircrafts:
+        if aircraft.deparature_time and aircraft.deparature_time <= time:
+            FreeGate(bcn, aircraft.aircraft_id)
+
+    # Assigns gates to aircraft landing in the one-hour period [time, time_end)
+    for aircraft in aircrafts:
+        if aircraft.landing_time is not None and time <= aircraft.landing_time < time_end:
+            result = AssignGate(bcn, aircraft)
+            if result == -1:
+                not_assigned += 1
+
+    return not_assigned
+
+
+# Plots the total number of gates assigned per terminal per hour and the number of unassigned aircraft per hour
+def PlotDayOccupancy(bcn, aircrafts):
+    # Checks if the list is empty
+    if not aircrafts:
+        print("Error: The aircraft list is empty. The graphic cannot be generated.")
+        return
+
+    hours = [f"{i:02d}:00" for i in range(24)]
+    not_assigned_per_hour = []
+
+    # One list of gate counts per terminal per hour
+    terminal_names = [t.name for t in bcn.terminals]
+    terminal_counts = []
+    for t in bcn.terminals:
+        terminal_counts.append([])
+
+    for hour in hours:
+        # Assigns gates for this hour and records unassigned count
+        not_assigned = AssignGatesAtTime(bcn, aircrafts, hour)
+        not_assigned_per_hour.append(not_assigned)
+
+        # Counts occupied gates per terminal after assignment
+        for i, terminal in enumerate(bcn.terminals):
+            count = 0
+            for area in terminal.boarding_areas:
+                for gate in area.gates:
+                    if gate.occupied:
+                        count += 1
+            terminal_counts[i].append(count)
+
+    # Builds the stacked bar chart
+    plt.figure(figsize=(14, 6))
+
+    bottom = [0] * 24
+    for i, t_name in enumerate(terminal_names):
+        plt.bar(hours, terminal_counts[i], bottom=bottom, label=f"Terminal {t_name}", edgecolor='black')
+        for j in range(24):
+            bottom[j] += terminal_counts[i][j]
+
+    # Plots the unassigned aircraft as a line on top
+    plt.plot(hours, not_assigned_per_hour, color='red', marker='o', label='Not assigned', linewidth=2)
+
+    plt.title('Gate occupancy per terminal throughout the day')
+    plt.xlabel('Time of the day')
+    plt.ylabel('Number of gates assigned / aircraft not assigned')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)

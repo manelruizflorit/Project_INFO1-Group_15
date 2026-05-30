@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Code Annotations" />
+    <list default="true" id="ce6ebca6-4f92-4740-b760-adca7e2a653d" name="Changes" comment="Code Annotations">
+      <change afterPath="$PROJECT_DIR$/Deparatures.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Project_INFO1-Group_15.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_05_2026,_12_03_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_05_2026__12_03__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aircraft.py" beforeDir="false" afterPath="$PROJECT_DIR$/Aircraft.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LEBL.py" beforeDir="false" afterPath="$PROJECT_DIR$/LEBL.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,7 +42,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/manelruizflorit/Project_INFO1-Group_15.git&quot;,
-    &quot;accountId&quot;: &quot;59e82cf3-2835-42d9-95ba-334c1b126cca&quot;
+    &quot;accountId&quot;: &quot;d401ea14-3304-4aaa-9efc-db1c8e31c008&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -294,7 +302,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779273270086</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Code Annotations">
+      <option name="closed" value="true" />
+      <created>1779274596868</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1779274596868</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
