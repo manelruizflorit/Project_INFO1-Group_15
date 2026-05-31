@@ -214,7 +214,7 @@ def AssignNightGates(bcn, aircrafts):
 
     for aircraft in aircrafts:
         # Skips aircraft that have arrival data (not a night aircraft)
-        if aircraft.landing_time and aircraft.original_airport == "LEBL":
+        if aircraft.landing_time is not None and aircraft.original_airport == "LEBL":
             AssignGate(bcn,aircraft)
 
     return 0
@@ -247,7 +247,7 @@ def AssignGatesAtTime(bcn, aircrafts, time):
 
     # Frees gates of aircraft that have already departed before the current time
     for aircraft in aircrafts:
-        if aircraft.deparature_time and aircraft.deparature_time <= time:
+        if aircraft.deparature_time is not None and aircraft.deparature_time <= time:
             FreeGate(bcn, aircraft.aircraft_id)
 
     # Assigns gates to aircraft landing in the one-hour period [time, time_end)
@@ -267,13 +267,21 @@ def PlotDayOccupancy(bcn, aircrafts):
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
         return
 
-    hours = [f"{i:02d}:00" for i in range(24)]
+    hours = []
+    i = 0
+    while i < 24:
+        if i < 10:
+            hours.append("0" + str(i) + ":00")
+        else:
+            hours.append(str(i) + ":00")
+        i += 1
     not_assigned_per_hour = []
 
     # One list of gate counts per terminal per hour
-    terminal_names = [t.name for t in bcn.terminals]
+    terminal_names = []
     terminal_counts = []
-    for t in bcn.terminals:
+    for terminal in bcn.terminals:
+        terminal_names.append(terminal.name)
         terminal_counts.append([])
 
     for hour in hours:
@@ -282,29 +290,36 @@ def PlotDayOccupancy(bcn, aircrafts):
         not_assigned_per_hour.append(not_assigned)
 
         # Counts occupied gates per terminal after assignment
-        for i, terminal in enumerate(bcn.terminals):
+        i = 0
+        for terminal in bcn.terminals:
             count = 0
             for area in terminal.boarding_areas:
                 for gate in area.gates:
                     if gate.occupied:
                         count += 1
             terminal_counts[i].append(count)
+            i += 1
 
     # Builds the stacked bar chart
     plt.figure(figsize=(14, 6))
-
     bottom = [0] * 24
-    for i, t_name in enumerate(terminal_names):
-        plt.bar(hours, terminal_counts[i], bottom=bottom, label=f"Terminal {t_name}", edgecolor='black')
-        for j in range(24):
-            bottom[j] += terminal_counts[i][j]
+    i = 0
+    for t_name in terminal_names:
+        plt.bar(hours, terminal_counts[i], bottom=bottom, label="Terminal " + t_name, edgecolor="black")
+        j = 0
+        while j < 24:
+            bottom[j] = bottom[j] + terminal_counts[i][j]
+            j += 1
+        i += 1
 
     # Plots the unassigned aircraft as a line on top
-    plt.plot(hours, not_assigned_per_hour, color='red', marker='o', label='Not assigned', linewidth=2)
+    plt.plot(hours, not_assigned_per_hour, color="red", marker="o", label="Not assigned", linewidth=2)
 
-    plt.title('Gate occupancy per terminal throughout the day')
-    plt.xlabel('Time of the day')
-    plt.ylabel('Number of gates assigned / aircraft not assigned')
+    plt.title("Gate occupancy per terminal throughout the day")
+    plt.xlabel("Time of the day")
+    plt.ylabel("Number of gates assigned / aircraft not assigned")
     plt.xticks(rotation=45)
     plt.legend()
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.tight_layout()
+    plt.show()

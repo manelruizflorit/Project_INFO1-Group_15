@@ -43,7 +43,7 @@ def LoadArrivals(filename):
                 elif linea == False:
                     # Creates a new Aircraft object and adds it to the list
                     aircraft_id = str(parts[0]).upper()
-                    new_aircraft = Aircraft(aircraft_id, parts[1], parts[2], parts[3])
+                    new_aircraft = Aircraft(aircraft_id, parts[1], parts[2], parts[3], None, None)
                     arrivals_list.append(new_aircraft)
                 else:
                     linea = False
@@ -333,41 +333,30 @@ def ShowLongDistanceFlights(aircrafts):
         route_kml = os.path.join(os.getcwd(), "flights.kml")
         os.startfile(route_kml)
 
-def LoadDepartures (filename):
-    deparatures_list = []
-    # Returns an empty list if the file doesn't exist
+def LoadDepartures(filename):
+    departures_list = []
     if not os.path.exists(filename):
         return []
     with open(filename, 'r') as q:
-        line = q.readlines()
+        lines = q.readlines()
 
-        # Returns empty list if the file has only a header or is empty
-        if len(line) <= 1:
+        if len(lines) <= 1:
             return []
 
-        for i in range(1, len(line)):
-            line = line[i].strip()
+        for i in range(1, len(lines)):  # ← len(lines) no len(line)
+            line = lines[i].strip()
             if not line:
                 continue
             parts = line.split()
             if len(parts) == 4:
-                # Skips the line if any field has an incorrect length
                 if len(parts[0]) > 6 or len(parts[1]) != 4 or len(parts[3]) != 3:
-                    line = True
-                elif line == False:
-                    # Creates a new Aircraft object and adds it to the list
-                    aircraft_id = str(parts[0]).upper()
-                    new_aircraft = Aircraft
-                    new_aircraft.aircraft_id = aircraft_id
-                    new_aircraft.destination_airport = parts[1]
-                    new_aircraft.origin_airport = "LEBL"
-                    new_aircraft.airline_company = parts[3]
-                    new_aircraft.deparature_time = parts[2]
-                    deparatures_list.append(new_aircraft)
-                else:
-                    line = False
+                    continue
+                aircraft_id = str(parts[0]).upper()
+                # Creates Aircraft with departure data and None for arrival fields
+                new_aircraft = Aircraft(aircraft_id, "LEBL", None, parts[3], parts[1], parts[2])
+                departures_list.append(new_aircraft)
 
-    return deparatures_list
+    return departures_list
 
 def MergeMovements(arrivals, departures):
     # Returns error code if either list is empty
@@ -404,7 +393,7 @@ def NightAircraft(aircrafts):
 
     for aircraft in aircrafts:
         # Checks if the aircraft has no arrival but has departure information
-        if aircraft.landing_time and aircraft.origin_airport == "LEBL":
+        if aircraft.landing_time is not None and aircraft.origin_airport == "LEBL":
             night_list.append(aircraft)
 
     return night_list
