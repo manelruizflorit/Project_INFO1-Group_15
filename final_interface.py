@@ -202,6 +202,19 @@ def show_gate_occupancy():
         return
     PlotDayOccupancy(bcn_airport, my_flights)
 
+#alex project exam
+def count_departures_before():
+    count = 0
+    hour = int(entry_hour.get())
+    i = 0
+    while i < len(my_departures):
+        departure_hour = int(my_departures[i].deparature_time.split(":")[0])
+        if departure_hour < hour:
+            count += 1
+        i += 1
+    print(count)
+    messagebox.showinfo("Success", f"Number of departures before: {count}")
+
 
 # ==========================================
 # WINDOW SETUP
@@ -276,6 +289,11 @@ tk.Button(frame_flights, text="Plot Schengen", width=20, command=plot_types).gri
 tk.Button(frame_flights, text="Flights on Map", width=20, command=map_flights).grid(row=3, column=1)
 tk.Button(frame_flights, text="Long Distance Flights on Map", width=42, command=long_distance_flights).grid(row=4, columnspan=2, pady=5)
 tk.Button(frame_flights, text="Save Arrivals", width=42, command=save_flights).grid(row=5, columnspan=2)
+
+#alex project exam
+entry_hour = tk.Entry(frame_flights, width=5)
+entry_hour.grid(row=6, column=0, pady=5)
+tk.Button(frame_flights, text="Departures before introduced hour", command=count_departures_before).grid(row=6, column=1)
 
 # Buttons for gate management
 frame_gates = tk.LabelFrame(window, text="Gate Management", padx=10, pady=10)
