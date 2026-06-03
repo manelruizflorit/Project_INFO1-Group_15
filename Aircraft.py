@@ -334,8 +334,6 @@ def ShowLongDistanceFlights(aircrafts):
         os.startfile(route_kml)
 
 def LoadDepartures(filename):
-    # Opens a text file and reads departure data line by line, skipping the header and any malformed lines
-    # Returns a list of Aircraft objects with departure data, or an empty list if the file doesn't exist
     departures_list = []
     if not os.path.exists(filename):
         return []
@@ -345,7 +343,7 @@ def LoadDepartures(filename):
         if len(lines) <= 1:
             return []
 
-        for i in range(1, len(lines)):
+        for i in range(1, len(lines)):  # ← len(lines) no len(line)
             line = lines[i].strip()
             if not line:
                 continue
@@ -361,9 +359,7 @@ def LoadDepartures(filename):
     return departures_list
 
 def MergeMovements(arrivals, departures):
-    # Matches each arrival with its corresponding departure by aircraft ID
-    # Only merges pairs where the landing time is strictly before the departure time
-    # Returns a list of merged Aircraft objects, or -1 if either input list is empty
+    # Returns error code if either list is empty
     if not arrivals or not departures:
         return -1
 
@@ -388,22 +384,17 @@ def MergeMovements(arrivals, departures):
 
     return merged_list
 
-
 def NightAircraft(aircrafts):
-    # Filters the input list and returns only aircraft that have no arrival data (night aircraft)
-    # Night aircraft are those that stayed overnight: they only have departure information
-    # Returns a list of night Aircraft objects, or -1 if the input list is empty or no night aircraft are found
+    # Returns error code if the list is empty
     if not aircrafts:
         return -1
 
     night_list = []
 
     for aircraft in aircrafts:
-        # A night aircraft has no landing time but does have a destination
-        if aircraft.landing_time is None and aircraft.destination_airport is not None:
+        # Checks if the aircraft has no arrival but has departure information
+        if aircraft.deparature_time is not None:
             night_list.append(aircraft)
 
-    if not night_list:
-        return -1
-
     return night_list
+

@@ -264,7 +264,7 @@ def PlotDayOccupancy(bcn, aircrafts):
     # Checks if the list is empty
     if not aircrafts:
         print("Error: The aircraft list is empty. The graphic cannot be generated.")
-        return
+        return -1
 
     hours = []
     i = 0
@@ -322,3 +322,7 @@ def PlotDayOccupancy(bcn, aircrafts):
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
     plt.show()
+
+
+
+
