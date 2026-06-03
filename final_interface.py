@@ -212,7 +212,6 @@ def count_departures_before():
         if departure_hour < hour:
             count += 1
         i += 1
-    print(count)
     messagebox.showinfo("Success", f"Number of departures before: {count}")
 
 

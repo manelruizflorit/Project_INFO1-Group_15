@@ -205,9 +205,11 @@ def AssignGate(bcn, aircraft):
 
     return -1
 
-# Assigns a gate to each night aircraft (departure only, no arrival data)
-# Returns -1 if the list is empty or if any aircraft has arrival data it is skipped
+
 def AssignNightGates(bcn, aircrafts):
+    # Assigns a gate to each aircraft in the list using AssignGate
+    # All aircraft in the list are assumed to be departure-only (night aircraft)
+    # Returns -1 if the input list is empty, 0 on success
     if not aircrafts:
         return -1
 
@@ -216,10 +218,10 @@ def AssignNightGates(bcn, aircrafts):
 
     return 0
 
-# Finds the gate assigned to the given aircraft ID and sets it to free
-# Returns -1 if the aircraft is not found in any gate, 0 on success
+
 def FreeGate(bcn, id):
-    # Loops through all terminals, areas and gates to find the aircraft
+    # Finds the gate assigned to the given aircraft ID and sets it to free
+    # Returns -1 if the aircraft is not found in any gate, 0 on success
     for terminal in bcn.terminals:
         for area in terminal.boarding_areas:
             for gate in area.gates:
@@ -231,9 +233,10 @@ def FreeGate(bcn, id):
     return -1
 
 
-# Frees gates of departed aircraft and assigns gates to aircraft landing in the one-hour period starting at time
-# Returns the number of aircraft that could not be assigned a gate due to full occupancy
 def AssignGatesAtTime(bcn, aircrafts, time):
+    # Frees gates of aircraft that have already departed before the given time
+    # Then assigns gates to aircraft landing in the one-hour window starting at time
+    # Returns the number of aircraft that could not be assigned a gate due to full occupancy
     not_assigned = 0
 
     # Calculates the end of the one-hour period
