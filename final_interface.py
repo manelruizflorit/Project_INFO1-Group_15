@@ -106,7 +106,7 @@ def merge_movements():
     global my_flights
     result = MergeMovements(my_arrivals, my_departures)
     if result == -1:
-        messagebox.showerror("Error", "Could not merge. Make sure both arrivals and departures are loaded.")
+        messagebox.showerror("Error", "Could not merge...")
     else:
         my_flights = result
         messagebox.showinfo("Success", f"Merged {len(my_flights)} movements successfully!")
@@ -180,9 +180,9 @@ def assign_night_gates():
     if bcn_airport is None:
         messagebox.showerror("Error", "Airport structure not loaded. Please load LEBL airport first.")
         return
-    night = NightAircraft(my_flights)
+    night = NightAircraft(my_departures)  # <-- cambia my_flights por my_departures
     if night == -1:
-        messagebox.showerror("Error", "No merged flights loaded. Please load and merge movements first.")
+        messagebox.showerror("Error", "No departures loaded or no night aircraft found.")
         return
     result = AssignNightGates(bcn_airport, night)
     if result == -1:

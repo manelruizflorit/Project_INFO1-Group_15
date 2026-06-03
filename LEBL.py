@@ -208,17 +208,13 @@ def AssignGate(bcn, aircraft):
 # Assigns a gate to each night aircraft (departure only, no arrival data)
 # Returns -1 if the list is empty or if any aircraft has arrival data it is skipped
 def AssignNightGates(bcn, aircrafts):
-    # Returns error code if the list is empty
     if not aircrafts:
         return -1
 
     for aircraft in aircrafts:
-        # Skips aircraft that have arrival data (not a night aircraft)
-        if aircraft.landing_time is not None and aircraft.original_airport == "LEBL":
-            AssignGate(bcn,aircraft)
+        AssignGate(bcn, aircraft)
 
     return 0
-
 
 # Finds the gate assigned to the given aircraft ID and sets it to free
 # Returns -1 if the aircraft is not found in any gate, 0 on success

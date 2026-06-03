@@ -384,17 +384,19 @@ def MergeMovements(arrivals, departures):
 
     return merged_list
 
+
 def NightAircraft(aircrafts):
-    # Returns error code if the list is empty
     if not aircrafts:
         return -1
 
     night_list = []
 
     for aircraft in aircrafts:
-        # Checks if the aircraft has no arrival but has departure information
-        if aircraft.landing_time is not None and aircraft.origin_airport == "LEBL":
+        if aircraft.landing_time is None and aircraft.destination_airport is not None:
             night_list.append(aircraft)
+
+    if not night_list:
+        return -1
 
     return night_list
 
